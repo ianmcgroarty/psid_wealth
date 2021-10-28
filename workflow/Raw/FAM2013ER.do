@@ -1776,7 +1776,7 @@ infix
       ER58251      8863 - 8863      ER58252      8864 - 8864      ER58253      8865 - 8865 
       ER58254      8866 - 8866      ER58255      8867 - 8867      ER58256      8868 - 8868 
       ER58257      8869 - 8875 
-using D:/Veronika/psid_cleanup/data/untouched/FAM2013ER.txt, clear 
+using "$path/psid_cleanup/data/untouched/FAM2013ER.txt", clear 
 ;
 label variable  ER53001      "RELEASE NUMBER" ;                                  
 label variable  ER53002      "2013 FAMILY INTERVIEW (ID) NUMBER" ;               

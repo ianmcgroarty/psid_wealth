@@ -3,18 +3,25 @@
 Name: Veronika Konovalova
 Project: Wealth and FAFSA 
 Description: cleaning and stitching together all years of family files 
-Last Updated: 5/28/21
+Last Updated: 7/20/21
 
 */
 
-/*
-// Clean using prepared do-files 
-forv i = 2005(2)2017{
 clear
-do D:/Veronika/psid_cleanup/workflow/Raw/FAM`i'ER.do
-save D:/Veronika/psid_cleanup/data/raw/fam_`i'.dta, replace
+global path "D:/Ian"
+set maxvar 10000
+
+
+
+
+// Clean using prepared do-files 
+
+forv i = 2001(2)2017{
+clear
+do "$path/psid_cleanup/workflow/Raw/FAM`i'ER.do"
+save "$path/psid_cleanup/data/raw/fam_`i'.dta", replace
 }
-*/ 
+
 
 
 // Remember that for parents we want:
@@ -31,12 +38,134 @@ save D:/Veronika/psid_cleanup/data/raw/fam_`i'.dta, replace
   
 // Find the annual famliy ID and head ID + spouse ID. Save two datasets in each year 
 
+
 local list "f m ff fm mf mm"
 
 foreach p of local list{
+   
+// 2001
+	use "$path/psid_cleanup/data/raw/fam_2001.dta", clear
+	rename ER17002 int_num_`p'2001
+
+	* Family weight 
+	rename ER20394 fam_weight_`p'2001
+	
+	* Couple status 
+	rename ER20371 couple_status_`p'2001
+	
+	* Income
+	rename ER20456 tot_fam_income_`p'2001
+
+	* Retirement savings
+	rename ER19210 ira_annuity_`p'2001 
+	rename ER19349 tot_pension_`p'2001
+
+	* PSID imputes home equity by defining it as home value - mortgage
+	rename ER17044 home_value_`p'2001
+	rename ER17052 mortgage1_`p'2001
+	rename ER17063 mortgage2_`p'2001
+	g home_equity_`p'2001 = home_value_`p'2001 - mortgage1_`p'2001 - mortgage2_`p'2001
+	lab var home_equity_`p'2001 "HOME EQUITY"
+	
+	* Farm/business net value 
+	rename ER19198 biz_farm_netval_`p'2001
+	
+	* Inheritance 
+	rename ER19313 val_inheritance1_`p'2001
+	rename ER19318 val_inheritance2_`p'2001
+	rename ER19323 val_inheritance3_`p'2001
+	
+	* Savings 
+	rename ER19216 savings_`p'2001
+	
+	* Value of stocks 
+	rename ER19203 val_stocks_`p'2001
+	
+	* Debt 
+	rename ER19227 val_all_debt_`p'2001
+			replace val_all_debt_`p'2001       = . if val_all_debt_`p'2001      >= 9999998
+
+	gen val_debt_sl_`p'2001 = . 
+	gen val_debt_credit_`p'2001   = . 
+	gen val_debt_medical_`p'2001  = . 
+	gen val_debt_legal_`p'2001   = . 
+	gen val_debt_famloans_`p'2001 = . 
+	
+	keep int_num_`p'2001 couple_status_`p'2001 tot_fam_income_`p'2001 ///
+	ira_annuity_`p'2001 tot_pension_`p'2001 home_value_`p'2001 ///
+	mortgage1_`p'2001 mortgage2_`p'2001 home_equity_`p'2001 ///
+	biz_farm_netval_`p'2001 savings_`p'2001 val_stocks_`p'2001 ///
+	val_inheritance1_`p'2001 val_inheritance2_`p'2001 val_inheritance3_`p'2001 ///
+	val_all_debt_`p'2001 fam_weight_`p'2001 val_debt_sl_`p'2001 ///
+	val_debt_credit_`p'2001  val_debt_medical_`p'2001 val_debt_legal_`p'2001  val_debt_famloans_`p'2001
+
+	save "$path/psid_cleanup/data/raw/fam_2001_renamed_`p'.dta", replace 
+
+// 2003
+	use "$path/psid_cleanup/data/raw/fam_2003.dta", clear
+	rename ER21002 int_num_`p'2003
+
+	* Family weight 
+	rename ER24179 fam_weight_`p'2003
+	
+	* Couple status 
+	rename ER24152 couple_status_`p'2003
+	
+	* Income
+	rename ER24099 tot_fam_income_`p'2003
+
+	* Retirement savings
+	rename ER22590 ira_annuity_`p'2003 
+	rename ER22744 tot_pension_`p'2003
+
+	* PSID imputes home equity by defining it as home value - mortgage
+	rename ER21043 home_value_`p'2003
+	rename ER21051 mortgage1_`p'2003
+	rename ER21052 mortgage2_`p'2003
+	g home_equity_`p'2003 = home_value_`p'2003 - mortgage1_`p'2003 - mortgage2_`p'2003
+	lab var home_equity_`p'2003 "HOME EQUITY"
+	
+	* Farm/business net value 
+	rename ER22563 biz_farm_netval_`p'2003
+	
+	* Inheritance 
+	rename ER22708 val_inheritance1_`p'2003
+	rename ER22713 val_inheritance2_`p'2003
+	rename ER22718 val_inheritance3_`p'2003
+	
+	* Savings 
+	rename ER22596 savings_`p'2003
+	
+	* Value of stocks 
+	rename ER22568 val_stocks_`p'2003
+	
+	* Debt 
+	rename ER22622 val_all_debt_`p'2003
+			replace val_all_debt_`p'2003       = . if val_all_debt_`p'2003       >= 9999998
+
+	gen val_debt_sl_`p'2003 = . 
+	gen val_debt_credit_`p'2003   = . 
+	gen val_debt_medical_`p'2003  = . 
+	gen val_debt_legal_`p'2003   = . 
+	gen val_debt_famloans_`p'2003 = . 
+	
+	keep int_num_`p'2003 couple_status_`p'2003 tot_fam_income_`p'2003 ///
+	ira_annuity_`p'2003 tot_pension_`p'2003 home_value_`p'2003 ///
+	mortgage1_`p'2003 mortgage2_`p'2003 home_equity_`p'2003 ///
+	biz_farm_netval_`p'2003 savings_`p'2003 val_stocks_`p'2003 ///
+	val_inheritance1_`p'2003 val_inheritance2_`p'2003 val_inheritance3_`p'2003 ///
+	val_all_debt_`p'2003 fam_weight_`p'2003 val_debt_sl_`p'2003 ///
+	val_debt_credit_`p'2003  val_debt_medical_`p'2003 val_debt_legal_`p'2003  val_debt_famloans_`p'2003
+
+	save "$path/psid_cleanup/data/raw/fam_2003_renamed_`p'.dta", replace 
+
+	
 	// 2005
-	use D:/Veronika/psid_cleanup/data/raw/fam_2005.dta, clear
+	use "$path/psid_cleanup/data/raw/fam_2005.dta", clear
 	rename ER25002 int_num_`p'2005
+
+	* Family weight 
+	rename ER28078 fam_weight_`p'2005
 	
 	* Couple status 
 	rename ER28051 couple_status_`p'2005
@@ -69,19 +198,34 @@ foreach p of local list{
 	* Value of stocks 
 	rename ER26549 val_stocks_`p'2005
 	
+	* Debt 
+	rename ER26603 val_all_debt_`p'2005
+		replace val_all_debt_`p'2005       = . if val_all_debt_`p'2005       >= 9999998
+
+	gen val_debt_sl_`p'2005 = . 
+	gen val_debt_credit_`p'2005   = . 
+	gen val_debt_medical_`p'2005  = . 
+	gen val_debt_legal_`p'2005   = . 
+	gen val_debt_famloans_`p'2005 = . 
+	
 	keep int_num_`p'2005 couple_status_`p'2005 tot_fam_income_`p'2005 ///
 	ira_annuity_`p'2005 tot_pension_`p'2005 home_value_`p'2005 ///
 	mortgage1_`p'2005 mortgage2_`p'2005 home_equity_`p'2005 ///
 	biz_farm_netval_`p'2005 savings_`p'2005 val_stocks_`p'2005 ///
-	val_inheritance1_`p'2005 val_inheritance2_`p'2005 val_inheritance3_`p'2005
-	
-	save D:/Veronika/psid_cleanup/data/raw/fam_2005_renamed_`p'.dta, replace 
+	val_inheritance1_`p'2005 val_inheritance2_`p'2005 val_inheritance3_`p'2005 ///
+	val_all_debt_`p'2005 fam_weight_`p'2005 val_debt_sl_`p'2005 ///
+	val_debt_credit_`p'2005  val_debt_medical_`p'2005 val_debt_legal_`p'2005  val_debt_famloans_`p'2005
+
+	save "$path/psid_cleanup/data/raw/fam_2005_renamed_`p'.dta", replace 
 
 
 	// 2007
-	use D:/Veronika/psid_cleanup/data/raw/fam_2007.dta, clear
+	use "$path/psid_cleanup/data/raw/fam_2007.dta", clear
 	rename ER36002 int_num_`p'2007
-
+	
+	* Family weight 
+	rename ER41069 fam_weight_`p'2007
+	
 	* Couple status 
 	rename ER41041 couple_status_`p'2007
 	
@@ -112,19 +256,34 @@ foreach p of local list{
 	
 	* Value of stocks 
 	rename ER37567 val_stocks_`p'2007
-
+	
+	* Debt 
+	rename ER37621 val_all_debt_`p'2007
+	replace val_all_debt_`p'2007       = . if val_all_debt_`p'2007       >= 9999998
+	
+	gen val_debt_sl_`p'2007 = . 
+	gen val_debt_credit_`p'2007   = . 
+	gen val_debt_medical_`p'2007  = . 
+	gen val_debt_legal_`p'2007   = . 
+	gen val_debt_famloans_`p'2007 = . 
+	
 	keep int_num_`p'2007 couple_status_`p'2007 tot_fam_income_`p'2007 ///
 	ira_annuity_`p'2007 tot_pension_`p'2007 home_value_`p'2007 ///
 	mortgage1_`p'2007 mortgage2_`p'2007 home_equity_`p'2007 ///
 	biz_farm_netval_`p'2007 val_inheritance1_`p'2007 val_inheritance2_`p'2007 ///
-	val_inheritance3_`p'2007 savings_`p'2007 val_stocks_`p'2007
-	
-	save D:/Veronika/psid_cleanup/data/raw/fam_2007_renamed_`p'.dta, replace 
+	val_inheritance3_`p'2007 savings_`p'2007 val_stocks_`p'2007 ///
+	val_all_debt_`p'2007 fam_weight_`p'2007 val_debt_sl_`p'2007 ///
+	val_debt_credit_`p'2007  val_debt_medical_`p'2007 val_debt_legal_`p'2007  val_debt_famloans_`p'2007
 
+	save "$path/psid_cleanup/data/raw/fam_2007_renamed_`p'.dta", replace 
+	
 
 	// 2009
-	use D:/Veronika/psid_cleanup/data/raw/fam_2009.dta, clear
+	use "$path/psid_cleanup/data/raw/fam_2009.dta", clear
 	rename ER42002 int_num_`p'2009
+
+	* Family weight 
+	rename ER47012 fam_weight_`p'2009
 
 	* Couple status 
 	rename ER46985 couple_status_`p'2009
@@ -157,18 +316,32 @@ foreach p of local list{
 	* Value of stocks 
 	rename ER43558 val_stocks_`p'2009
 	
-	keep int_num_`p'2009 couple_status_`p'2009 ira_annuity_`p'2009 ///
-	tot_pension_`p'2009 home_value_`p'2009 /// 
-	mortgage1_`p'2009 mortgage2_`p'2009 home_equity_`p'2009 ///
-	biz_farm_netval_`p'2009 val_inheritance1_`p'2009 val_inheritance2_`p'2009 ///
-	val_inheritance3_`p'2009 savings_`p'2009 val_stocks_`p'2009 
+	* Debt 
+	rename ER43612 val_all_debt_`p'2009
+	replace val_all_debt_`p'2009       = . if val_all_debt_`p'2009       >= 9999998
+	*replace val_all_debt_`p'2009       = . if val_all_debt_`p'2009       == 2000000 
 	
-	save D:/Veronika/psid_cleanup/data/raw/fam_2009_renamed_`p'.dta, replace 
+	gen val_debt_sl_`p'2009 = . 
+	gen val_debt_credit_`p'2009   = . 
+	gen val_debt_medical_`p'2009  = . 
+	gen val_debt_legal_`p'2009    = . 
+	gen val_debt_famloans_`p'2009 = . 
+	
+	keep int_num_`p'2009 couple_status_`p'2009 ira_annuity_`p'2009 ///
+	tot_pension_`p'2009 home_value_`p'2009 tot_fam_income_`p'2009 /// 
+	mortgage1_`p'2009 mortgage2_`p'2009 home_equity_`p'2009 val_all_debt_`p'2009 ///
+	biz_farm_netval_`p'2009 val_inheritance1_`p'2009 val_inheritance2_`p'2009 ///
+	val_inheritance3_`p'2009 savings_`p'2009 val_stocks_`p'2009 fam_weight_`p'2009 val_debt_sl_`p'2009 ///
+	val_debt_credit_`p'2009  val_debt_medical_`p'2009 val_debt_legal_`p'2009  val_debt_famloans_`p'2009
 
-
+	 save "$path/psid_cleanup/data/raw/fam_2009_renamed_`p'.dta", replace 
+	
 	// 2011
-	use D:/Veronika/psid_cleanup/data/raw/fam_2011.dta, clear
+	use "$path/psid_cleanup/data/raw/fam_2011.dta", clear
 	rename ER47302 int_num_`p'2011
+	
+	* Family weight 
+	rename ER52436 fam_weight_`p'2011
 	
 	* Couple status 
 	rename ER52409 couple_status_`p'2011
@@ -202,21 +375,41 @@ foreach p of local list{
 	rename ER48883 val_stocks_`p'2011
 	
 	* Student loans 
-	rename ER48945 val_sl_`p'2011
+	rename ER48945 val_debt_sl_`p'2011
+	
+	* Other debt: more than one category 
+	rename ER48937 val_debt_credit_`p'2011
+	rename ER48949 val_debt_medical_`p'2011
+	rename ER48953 val_debt_legal_`p'2011
+	rename ER48957 val_debt_famloans_`p'2011
 
-	keep int_num_`p'2011 couple_status_`p'2011 tot_fam_income_`p'2011 ira_annuity_`p'2011 ///
+	replace val_debt_sl_`p'2011       = . if val_debt_sl_`p'2011       >= 9999998
+	replace val_debt_credit_`p'2011   = . if val_debt_credit_`p'2011   >= 9999998
+	replace val_debt_medical_`p'2011  = . if val_debt_medical_`p'2011  >= 9999998
+	replace val_debt_legal_`p'2011    = . if val_debt_legal_`p'2011    >= 9999998
+	replace val_debt_famloans_`p'2011 = . if val_debt_famloans_`p'2011 >= 9999998
+	
+	egen val_all_debt_`p'2011 = rowtotal(val_debt_credit_`p'2011 val_debt_medical_`p'2011 val_debt_legal_`p'2011 val_debt_famloans_`p'2011 val_debt_sl_`p'2011)
+	
+	keep int_num_`p'2011 couple_status_`p'2011 ///
+	tot_fam_income_`p'2011 ira_annuity_`p'2011 ///
 	tot_pension_`p'2011 home_value_`p'2011 ///
 	mortgage1_`p'2011 mortgage2_`p'2011 home_equity_`p'2011 /// 
 	biz_farm_netval_`p'2011 val_inheritance1_`p'2011 val_inheritance2_`p'2011 ///
-	savings_`p'2011 val_stocks_`p'2011 val_sl_`p'2011 
+	val_inheritance3_`p'2011 savings_`p'2011 val_stocks_`p'2011 val_debt_sl_`p'2011 ///
+	val_debt_credit_`p'2011 val_debt_medical_`p'2011 val_debt_legal_`p'2011 ///
+	val_debt_famloans_`p'2011 fam_weight_`p'2011 val_all_debt_`p'2011
 	
-	save D:/Veronika/psid_cleanup/data/raw/fam_2011_renamed_`p'.dta, replace 
+	save "$path/psid_cleanup/data/raw/fam_2011_renamed_`p'.dta", replace 
 
 
 	// 2013
-	use D:/Veronika/psid_cleanup/data/raw/fam_2013.dta, clear
+	use "$path/psid_cleanup/data/raw/fam_2013.dta", clear
 	rename ER53002 int_num_`p'2013
 
+	* Family weight 
+	rename ER58257 fam_weight_`p'2013
+	
 	* Couple status 
 	rename ER58227 couple_status_`p'2013
 	
@@ -252,22 +445,41 @@ foreach p of local list{
 	rename ER54634 val_stocks_`p'2013
 	
 	* Student loans 
-	rename ER54697 val_sl_`p'2013
+	rename ER54697 val_debt_sl_`p'2013
+	
+	* Other debt: more than one category 
+	rename ER54687 val_debt_credit_`p'2013
+	rename ER58193 val_debt_medical_`p'2013
+	rename ER54707 val_debt_legal_`p'2013
+	rename ER54712 val_debt_famloans_`p'2013
+	
+	replace val_debt_sl_`p'2013       = . if val_debt_sl_`p'2013       >= 9999998
+	replace val_debt_credit_`p'2013   = . if val_debt_credit_`p'2013   >= 9999998
+	replace val_debt_medical_`p'2013  = . if val_debt_medical_`p'2013  >= 9999998
+	replace val_debt_legal_`p'2013    = . if val_debt_legal_`p'2013    >= 9999998
+	replace val_debt_famloans_`p'2013 = . if val_debt_famloans_`p'2013 >= 9999998
+	
+	egen val_all_debt_`p'2013 = rowtotal(val_debt_credit_`p'2013 val_debt_medical_`p'2013 val_debt_legal_`p'2013 val_debt_famloans_`p'2013 val_debt_sl_`p'2013)
 	
 	keep int_num_`p'2013 couple_status_`p'2013 ira_annuity_`p'2013 ///
-	tot_pension_`p'2013 home_value_`p'2013 ///
+	tot_pension_`p'2013 home_value_`p'2013 tot_fam_income_`p'2013 ///
 	mortgage1_`p'2013 mortgage2_`p'2013 home_equity_`p'2013 /// 
 	biz_farm_debt_`p'2013 biz_farm_worth_`p'2013 val_inheritance1_`p'2013 ///
 	val_inheritance2_`p'2013 val_inheritance3_`p'2013 savings_`p'2013 ///
-	val_stocks_`p'2013 val_sl_`p'2013 
+	val_stocks_`p'2013 val_debt_sl_`p'2013 fam_weight_`p'2013 ///
+	val_debt_credit_`p'2013 val_debt_medical_`p'2013 val_debt_legal_`p'2013 ///
+	val_debt_famloans_`p'2013 val_all_debt_`p'2013
 	
-	save D:/Veronika/psid_cleanup/data/raw/fam_2013_renamed_`p'.dta, replace 
+	save "$path/psid_cleanup/data/raw/fam_2013_renamed_`p'.dta", replace 
 
 
 	// 2015
-	use D:/Veronika/psid_cleanup/data/raw/fam_2015.dta, clear
+	use "$path/psid_cleanup/data/raw/fam_2015.dta", clear
 	rename ER60002 int_num_`p'2015
 
+	* Family weight 
+	rename ER65492 fam_weight_`p'2015
+	
 	* Couple status 
 	rename ER65463 couple_status_`p'2015
 	
@@ -303,22 +515,41 @@ foreach p of local list{
 	rename ER61745 val_stocks_`p'2015
 	
 	* Student loans 
-	rename ER61808 val_sl_`p'2015
+	rename ER61808 val_debt_sl_`p'2015
+
+	* Other debt: more than one category 
+	rename ER61798 val_debt_credit_`p'2015
+	rename ER65390 val_debt_medical_`p'2015
+	rename ER61818 val_debt_legal_`p'2015
+	rename ER61823 val_debt_famloans_`p'2015
+
+	replace val_debt_sl_`p'2015       = . if val_debt_sl_`p'2015       >= 9999998
+	replace val_debt_credit_`p'2015   = . if val_debt_credit_`p'2015   >= 9999998
+	replace val_debt_medical_`p'2015  = . if val_debt_medical_`p'2015  >= 9999998
+	replace val_debt_legal_`p'2015    = . if val_debt_legal_`p'2015    >= 9999998
+	replace val_debt_famloans_`p'2015 = . if val_debt_famloans_`p'2015 >= 9999998
 	
+	egen val_all_debt_`p'2015 = rowtotal(val_debt_credit_`p'2015 val_debt_medical_`p'2015 val_debt_legal_`p'2015 val_debt_famloans_`p'2015 val_debt_sl_`p'2015)
+		
 	keep int_num_`p'2015 couple_status_`p'2015 ira_annuity_`p'2015 ///
-	tot_pension_`p'2015 home_value_`p'2015 ///
+	tot_pension_`p'2015 home_value_`p'2015 tot_fam_income_`p'2015 ///
 	mortgage1_`p'2015 mortgage2_`p'2015 home_equity_`p'2015 ///
 	biz_farm_debt_`p'2015 biz_farm_worth_`p'2015 val_inheritance1_`p'2015 ///
 	val_inheritance2_`p'2015 val_inheritance3_`p'2015 savings_`p'2015 ///
-	val_stocks_`p'2015 val_sl_`p'2015
+	val_stocks_`p'2015 val_debt_sl_`p'2015 fam_weight_`p'2015 ///
+	val_debt_credit_`p'2015 val_debt_medical_`p'2015 val_debt_legal_`p'2015 ///
+	val_debt_famloans_`p'2015 val_all_debt_`p'2015
 	
-	save D:/Veronika/psid_cleanup/data/raw/fam_2015_renamed_`p'.dta, replace 
+	save "$path/psid_cleanup/data/raw/fam_2015_renamed_`p'.dta", replace 
 
 
 	// 2017
-	use D:/Veronika/psid_cleanup/data/raw/fam_2017.dta, clear
+	use "$path/psid_cleanup/data/raw/fam_2017.dta", clear
 	rename ER66002 int_num_`p'2017
 
+	* Family weight 
+	rename ER71570 fam_weight_`p'2017
+	
 	* Couple status 
 	rename ER71542 couple_status_`p'2017
 	
@@ -354,22 +585,41 @@ foreach p of local list{
 	rename ER67798 val_stocks_`p'2017
 	
 	* Student loans 
-	rename ER67862 val_sl_`p'2017
+	rename ER67862 val_debt_sl_`p'2017
+
+	* Other debt: more than one category 
+	rename ER67852 val_debt_credit_`p'2017
+	rename ER71467 val_debt_medical_`p'2017
+	rename ER67872 val_debt_legal_`p'2017
+	rename ER67877 val_debt_famloans_`p'2017
+	
+	replace val_debt_sl_`p'2017       = . if val_debt_sl_`p'2017       >= 9999998
+	replace val_debt_credit_`p'2017   = . if val_debt_credit_`p'2017   >= 9999998
+	replace val_debt_medical_`p'2017  = . if val_debt_medical_`p'2017  >= 9999998
+	replace val_debt_legal_`p'2017    = . if val_debt_legal_`p'2017    >= 9999998
+	replace val_debt_famloans_`p'2017 = . if val_debt_famloans_`p'2017 >= 9999998
+	
+	egen val_all_debt_`p'2017 = rowtotal(val_debt_credit_`p'2017 val_debt_medical_`p'2017 val_debt_legal_`p'2017 val_debt_famloans_`p'2017 val_debt_sl_`p'2017)
 	
 	keep int_num_`p'2017 couple_status_`p'2017 ira_annuity_`p'2017 ///
-	tot_pension_`p'2017 home_value_`p'2017 /// 
+	tot_pension_`p'2017 home_value_`p'2017 tot_fam_income_`p'2017 /// 
 	mortgage1_`p'2017 mortgage2_`p'2017 home_equity_`p'2017 ///
 	biz_farm_debt_`p'2017 biz_farm_worth_`p'2017 val_inheritance1_`p'2017 ///
 	val_inheritance2_`p'2017 val_inheritance3_`p'2017 savings_`p'2017 ///
-	val_stocks_`p'2017 val_sl_`p'2017
+	val_stocks_`p'2017 val_debt_sl_`p'2017 fam_weight_`p'2017 ///
+	val_debt_credit_`p'2017 val_debt_medical_`p'2017 val_debt_legal_`p'2017 ///
+	val_debt_famloans_`p'2017 val_all_debt_`p'2017
 	
-	save D:/Veronika/psid_cleanup/data/raw/fam_2017_renamed_`p'.dta, replace 
+	
+	save "$path/psid_cleanup/data/raw/fam_2017_renamed_`p'.dta", replace 
 
 // Use supplement file to get net worth 
-forv i = 2005(2)2017{
+forv i = 2001(2)2017{
 clear
-do D:/Veronika/psid_cleanup/workflow/Raw/J293921
+do "$path/psid_cleanup/workflow/Raw/J293921
 
+rename ER17002 int_num_`p'2001
+rename ER21002 int_num_`p'2003
 rename ER25002 int_num_`p'2005
 rename ER36002 int_num_`p'2007
 rename ER42002 int_num_`p'2009
@@ -378,6 +628,8 @@ rename ER53002 int_num_`p'2013
 rename ER60002 int_num_`p'2015
 rename ER66002 int_num_`p'2017
 
+rename S517 total_wealth_equity_`p'2001
+rename S617 total_wealth_equity_`p'2003
 rename S717 total_wealth_equity_`p'2005
 rename S817 total_wealth_equity_`p'2007
 rename ER46970 total_wealth_equity_`p'2009
@@ -388,29 +640,7 @@ rename ER71485 total_wealth_equity_`p'2017
 
 keep int_num_`p'`i' total_wealth_equity_`p'`i'
 drop if int_num_`p'`i' == . 
-save D:/Veronika/psid_cleanup/data/raw/fam_wealth_`p'_`i'.dta, replace 
+save "$path/psid_cleanup/data/raw/fam_wealth_`p'_`i'.dta", replace 
 }
 	
 }
-
-
-
-// Now merge with TAS and IND
-use D:/Veronika/psid_cleanup/data/raw/tas_with_ind.dta, clear
-
-foreach p of local list{
-	forv i = 2005(2)2017{
-		merge m:1 int_num_`p'`i' using D:/Veronika/psid_cleanup/data/raw/fam_`i'_renamed_`p'.dta
-		drop if _merge == 2
-		drop _merge
-		
-		merge m:1 int_num_`p'`i' using D:/Veronika/psid_cleanup/data/raw/fam_wealth_`p'_`i'.dta
-		drop if _merge == 2
-		drop _merge
-	}
-}
-
-save D:/Veronika/psid_cleanup/data/raw/tas_ind_fam_merged.dta, replace 
-
-
-

@@ -1762,7 +1762,7 @@ infix
       ER52429      8716 - 8716      ER52430      8717 - 8717      ER52431      8718 - 8718 
       ER52432      8719 - 8719      ER52433      8720 - 8720      ER52434      8721 - 8721 
       ER52435      8722 - 8722      ER52436      8723 - 8729 
-using D:/Veronika/psid_cleanup/data/untouched/FAM2011ER.txt, clear 
+using "$path/psid_cleanup/data/untouched/FAM2011ER.txt", clear 
 ;
 label variable  ER47301      "RELEASE NUMBER" ;                                  
 label variable  ER47302      "2011 FAMILY INTERVIEW (ID) NUMBER" ;               

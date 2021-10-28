@@ -187,7 +187,7 @@ infix
       TA170826          1546 - 1548        TA170828          1549 - 1553        TA170829          1554 - 1558  
       TA171955          1559 - 1560        TA171981          1561 - 1562        TA171982          1563 - 1566  
       TA171983          1567 - 1568        TA171984          1569 - 1572        TA171990          1573 - 1574  
-using D:/Veronika/psid_cleanup/data/untouched/J293176.txt, clear 
+using "$path/psid_cleanup/data/untouched/J293176.txt", clear 
 ;
 label variable TAS             "Sum of All TAS Flags"                     ;
 label variable TAS05           "TAS2005 = 1 if exists, else missing"      ;

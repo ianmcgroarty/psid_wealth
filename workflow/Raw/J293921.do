@@ -27,7 +27,7 @@ infix
  long ER65408            161 - 169         ER66001            170 - 170         ER66002            171 - 175   
  long ER71485            176 - 184         ER72001            185 - 185         ER72002            186 - 190   
  long ER77511            191 - 199   
-using D:/Veronika/psid_cleanup/data/untouched/J293921.txt, clear 
+using "$path/psid_cleanup/data/untouched/J293921.txt", clear 
 ;
 label variable V10002          "1984 INTERVIEW NUMBER"                    ;
 label variable S117            "IMP WEALTH W/ EQUITY (WEALTH2) 84"        ;

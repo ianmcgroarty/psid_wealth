@@ -1719,7 +1719,7 @@ infix
       ER47004      8599 - 8599      ER47005      8600 - 8600      ER47006      8601 - 8601 
       ER47007      8602 - 8602      ER47008      8603 - 8603      ER47009      8604 - 8604 
       ER47010      8605 - 8605      ER47011      8606 - 8606      ER47012      8607 - 8613 
-using D:/Veronika/psid_cleanup/data/untouched/FAM2009ER.txt, clear 
+using "$path/psid_cleanup/data/untouched/FAM2009ER.txt", clear 
 ;
 label variable  ER42001      "RELEASE NUMBER" ;                                  
 label variable  ER42002      "2009 FAMILY INTERVIEW (ID) NUMBER" ;               
