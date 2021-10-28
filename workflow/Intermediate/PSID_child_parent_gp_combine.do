@@ -15,7 +15,7 @@ Last Updated: 5/25/21
 
 clear
 
-do D:/Veronika/psid_cleanup/workflow/Raw/fim11418_gid_BA_2_UBL_wide.do 
+do "$path/psid_cleanup/workflow/Raw/fim11418_gid_BA_2_UBL_wide.do" 
 
 * Individual ID for person in question
 rename ER30001 famid
@@ -50,7 +50,8 @@ tostring famidpn_m, gen(famidpns_m)
 	
 keep famidpns famidpn_f famidpn_m
 
-save "D:/Veronika/psid_cleanup/data/Raw/parent_child.dta", replace 
+save "$path/psid_cleanup/data/raw/parent_child.dta", replace 
+sort famidpn_f
 
 *******************************
 *******************************
@@ -60,7 +61,7 @@ save "D:/Veronika/psid_cleanup/data/Raw/parent_child.dta", replace
 * drop grandparent if 800+
 clear
 
-do D:/Veronika/psid_cleanup/workflow/Raw/fim11421_gid_BA_3_UBL_wide.do 
+do "$path/psid_cleanup/workflow/Raw/fim11421_gid_BA_3_UBL_wide.do" 
 
 * Individual ID for person in question
 rename ER30001 famid
@@ -105,7 +106,7 @@ tostring pn_ff, gen(famidpns_ff)
 order famidpns famidpn_mm famidpn_mf famidpn_fm famidpn_ff
 keep famidpns famidpn_mm famidpn_mf famidpn_fm famidpn_ff
 
-save "D:/Veronika/psid_cleanup/data/Raw/grandparent_child.dta", replace 
+save "$path/psid_cleanup/data/raw/grandparent_child.dta", replace 
 
 ***************************************
 ***************************************
@@ -114,18 +115,18 @@ save "D:/Veronika/psid_cleanup/data/Raw/grandparent_child.dta", replace
 ***************************************
 
 * Step 1: merge wide TAS with parent-child and gp-child identifiers on child ID
-use D:/Veronika/psid_cleanup/data/raw/tas_psid_renamed.dta, clear
+use "$path/psid_cleanup/data/raw/tas_psid_renamed.dta", clear
 
-merge 1:1 famidpns using "D:/Veronika/psid_cleanup/data/Raw/parent_child.dta"
+merge 1:1 famidpns using "$path/psid_cleanup/data/raw/parent_child.dta"
 
 // Note there's a weird child ID without a match 
 drop if _merge == 2
 drop _merge 
 
-merge 1:1 famidpns using "D:/Veronika/psid_cleanup/data/Raw/grandparent_child.dta"
+merge 1:1 famidpns using "$path/psid_cleanup/data/raw/grandparent_child.dta"
 
 // We expect more unmatched grandchildren here. That's fine. 
 drop if _merge ==2
 drop _merge 
 
-save D:/Veronika/psid_cleanup/data/raw/tas_fims.dta, replace
+save "$path/psid_cleanup/data/raw/tas_fims.dta", replace
