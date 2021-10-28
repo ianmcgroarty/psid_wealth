@@ -425,7 +425,7 @@ infix
       TA131237     2077 - 2079      TA131238     2080 - 2082      TA131239     2083 - 2085 
       TA131240     2086 - 2088      TA131241     2089 - 2090      TA131242     2091 - 2096 
       TA131243     2097 - 2102      TA131244     2103 - 2104 
-using D:/Veronika/psid_cleanup/data/untouched/TA2013.txt, clear 
+using "$path/psid_cleanup/data/untouched/TA2013.txt", clear 
 ;
 label variable  TA130001     "RELEASE NUMBER" ;                                  
 label variable  TA130002     "2013 TA INTERVIEW (ID) NUMBER" ;                   

@@ -1078,7 +1078,7 @@ infix
       ER28071      6710 - 6710      ER28072      6711 - 6711      ER28073      6712 - 6712 
       ER28074      6713 - 6713      ER28075      6714 - 6714      ER28076      6715 - 6715 
       ER28077      6716 - 6716      ER28078      6717 - 6723 
-using D:/Veronika/psid_cleanup/data/untouched/FAM2005ER.txt, clear 
+using "$path/psid_cleanup/data/untouched/FAM2005ER.txt", clear 
 ;
 label variable  ER25001      "RELEASE NUMBER" ;                                  
 label variable  ER25002      "2005 FAMILY INTERVIEW (ID) NUMBER" ;               

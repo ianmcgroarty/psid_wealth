@@ -824,7 +824,7 @@ infix
       ER34858     5663 - 5664       ER34859     5665 - 5666       ER34860     5667 - 5667 
       ER34861     5668 - 5669       ER34862     5670 - 5671       ER34863     5672 - 5678 
  long ER34864     5679 - 5683 
-using D:/Veronika/psid_cleanup/data/untouched/IND2019ER.txt, clear 
+using "$path/psid_cleanup/data/untouched/IND2019ER.txt", clear 
 ;
 label variable  ER30000      "RELEASE NUMBER" ;                                  
 label variable  ER30001      "1968 INTERVIEW NUMBER" ;                           

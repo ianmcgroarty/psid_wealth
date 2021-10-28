@@ -325,7 +325,7 @@ infix
       TA070937     1571 - 1577      TA070938     1578 - 1580      TA070939     1581 - 1583 
       TA070940     1584 - 1586      TA070941     1587 - 1589      TA070942     1590 - 1592 
       TA070943     1593 - 1595 
-using D:/Veronika/psid_cleanup/data/untouched/TA2007.txt, clear 
+using "$path/psid_cleanup/data/untouched/TA2007.txt", clear 
 ;
 label variable  TA070001   "RELEASE NUMBER" ;                                  
 label variable  TA070002   "2007 TA INTERVIEW (ID) NUMBER" ;                   

@@ -394,7 +394,7 @@ infix
       TA111144     1911 - 1913      TA111145     1914 - 1916      TA111146     1917 - 1919 
       TA111147     1920 - 1922      TA111148     1923 - 1925      TA111149     1926 - 1928 
       TA111150     1929 - 1930      TA111151     1931 - 1936      TA111152     1937 - 1942 
-using D:/Veronika/psid_cleanup/data/untouched/TA2011.txt, clear 
+using "$path/psid_cleanup/data/untouched/TA2011.txt", clear 
 ;
 label variable  TA110001   "RELEASE NUMBER" ;                                  
 label variable  TA110002   "2011 TA INTERVIEW (ID) NUMBER" ;                   

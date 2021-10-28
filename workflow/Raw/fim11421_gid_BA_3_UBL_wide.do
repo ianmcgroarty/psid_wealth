@@ -52,7 +52,7 @@ infix
          ER30002_GP_MF       138 - 140  
          ER30001_GP_MM       141 - 144  
          ER30002_GP_MM       145 - 147  
-using D:/Veronika/psid_cleanup/data/untouched/fims2.txt, clear 
+using "$path/psid_cleanup/data/untouched/fims2.txt", clear 
 ;
 label variable  ER30001              "1968 INTERVIEW NUMBER" ;
 label variable  ER30002              "PERSON NUMBER 68" ;

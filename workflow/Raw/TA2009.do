@@ -347,7 +347,7 @@ infix
       TA091003     1673 - 1675      TA091004     1676 - 1678      TA091005     1679 - 1681 
       TA091006     1682 - 1684      TA091007     1685 - 1687      TA091008     1688 - 1689 
       TA091009     1690 - 1695      TA091010     1696 - 1701 
-using D:/Veronika/psid_cleanup/data/untouched/TA2009.txt, clear 
+using "$path/psid_cleanup/data/untouched/TA2009.txt", clear 
 ;
 label variable  TA090001   "RELEASE NUMBER" ;                                  
 label variable  TA090002   "2009 TA INTERVIEW (ID) NUMBER" ;                   

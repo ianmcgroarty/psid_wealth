@@ -1867,7 +1867,7 @@ infix
       ER71563     9449 - 9449       ER71564     9450 - 9450       ER71565     9451 - 9451 
       ER71566     9452 - 9452       ER71567     9453 - 9453       ER71568     9454 - 9454 
       ER71569     9455 - 9455       ER71570     9456 - 9462  long ER71571     9463 - 9471 
-using D:/Veronika/psid_cleanup/data/untouched/FAM2017ER.txt, clear 
+using "$path/psid_cleanup/data/untouched/FAM2017ER.txt", clear 
 ;
 label variable  ER66001      "RELEASE NUMBER" ;                                  
 label variable  ER66002      "2017 FAMILY INTERVIEW (ID) NUMBER" ;               

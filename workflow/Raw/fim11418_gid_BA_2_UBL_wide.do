@@ -20,7 +20,7 @@ infix
          ER30002_P_F          26 - 28   
          ER30001_P_M          29 - 32   
          ER30002_P_M          33 - 35   
-using D:/Veronika/psid_cleanup/data/untouched/fims.txt, clear 
+using "$path/psid_cleanup/data/untouched/fims.txt", clear 
 ;
 label variable  ER30001              "1968 INTERVIEW NUMBER" ;
 label variable  ER30002              "PERSON NUMBER 68" ;

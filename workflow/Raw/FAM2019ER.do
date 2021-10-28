@@ -1888,7 +1888,7 @@ infix
       ER77626     9632 - 9632       ER77627     9633 - 9633       ER77628     9634 - 9634 
       ER77629     9635 - 9635       ER77630     9636 - 9636       ER77631     9637 - 9643 
  long ER77632     9644 - 9652 
-using D:/Veronika/psid_cleanup/data/untouched/FAM2019ER.txt, clear 
+using "$path/psid_cleanup/data/untouched/FAM2019ER.txt", clear 
 ;
 label variable  ER72001      "RELEASE NUMBER" ;                                  
 label variable  ER72002      "2019 FAMILY INTERVIEW (ID) NUMBER" ;               

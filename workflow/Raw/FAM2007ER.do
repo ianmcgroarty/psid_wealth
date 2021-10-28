@@ -1746,7 +1746,7 @@ infix
       ER41063      8692 - 8692      ER41064      8693 - 8693      ER41065      8694 - 8694 
       ER41066      8695 - 8695      ER41067      8696 - 8696      ER41068      8697 - 8697 
       ER41069      8698 - 8704 
-using D:/Veronika/psid_cleanup/data/untouched/FAM2007ER.txt, clear 
+using "$path/psid_cleanup/data/untouched/FAM2007ER.txt", clear 
 ;
 label variable  ER36001      "RELEASE NUMBER" ;                                  
 label variable  ER36002      "2007 FAMILY INTERVIEW (ID) NUMBER" ;               

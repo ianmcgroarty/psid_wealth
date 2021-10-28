@@ -1841,7 +1841,7 @@ infix
       ER65485      9237 - 9237      ER65486      9238 - 9238      ER65487      9239 - 9239 
       ER65488      9240 - 9240      ER65489      9241 - 9241      ER65490      9242 - 9242 
       ER65491      9243 - 9243      ER65492      9244 - 9250 
-using D:/Veronika/psid_cleanup/data/untouched/FAM2015ER.txt, clear 
+using "$path/psid_cleanup/data/untouched/FAM2015ER.txt", clear 
 ;
 label variable  ER60001      "RELEASE NUMBER" ;                                  
 label variable  ER60002      "2015 FAMILY INTERVIEW (ID) NUMBER" ;               

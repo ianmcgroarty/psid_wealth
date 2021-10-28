@@ -446,7 +446,7 @@ infix
       TA151298     2156 - 2158      TA151299     2159 - 2161      TA151300     2162 - 2164 
       TA151301     2165 - 2166      TA151302     2167 - 2172      TA151303     2173 - 2178 
       TA151304     2179 - 2180 
-using D:/Veronika/psid_cleanup/data/untouched/TA2015.txt, clear 
+using "$path/psid_cleanup/data/untouched/TA2015.txt", clear 
 ;
 label variable  TA150001     "RELEASE NUMBER" ;                                  
 label variable  TA150002     "2015 TAS INTERVIEW (ID) NUMBER" ;                  

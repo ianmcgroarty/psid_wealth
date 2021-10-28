@@ -678,7 +678,7 @@ infix
       TA171996    2963 - 2963       TA171997    2964 - 2964       TA171998    2965 - 2967 
       TA171999    2968 - 2970       TA172000    2971 - 2973       TA172001    2974 - 2976 
       TA172002    2977 - 2979       TA172003    2980 - 2982 
-using D:/Veronika/psid_cleanup/data/untouched/TA2017.txt, clear 
+using "$path/psid_cleanup/data/untouched/TA2017.txt", clear 
 ;
 label variable  TA170001     "RELEASE NUMBER" ;                                  
 label variable  TA170002     "2017 TAS INTERVIEW (ID) NUMBER" ;                  

@@ -331,7 +331,7 @@ infix
       TA050955     1665 - 1671      TA050956     1672 - 1674      TA050957     1675 - 1677 
       TA050958     1678 - 1680      TA050959     1681 - 1683      TA050960     1684 - 1686 
       TA050961     1687 - 1689 
-using D:/Veronika/psid_cleanup/data/untouched/TA2005.txt, clear 
+using "$path/psid_cleanup/data/untouched/TA2005.txt", clear 
 ;
 label variable  TA050001   "RELEASE NUMBER" ;                                  
 label variable  TA050002   "2005 TA INTERVIEW (ID) NUMBER" ;                   
