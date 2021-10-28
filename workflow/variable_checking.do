@@ -1364,7 +1364,7 @@ if $keep_ages == 1 {
 *drop tas_cross_weight2005 tas_cross_weight2007 tas_cross_weight2009 tas_cross_weight2011 tas_cross_weight2013 tas_cross_weight2015
 
 	
-/* Rename BACK for phil
+/* Rename BACK for phil he doesn't want this anymore
 	rename tas_long_weight	    tas_weight
 	rename tas_cross_weight cross_sectional_weight  
 	rename ind_long_weight  ind_weight              
@@ -1380,6 +1380,20 @@ save "$path/psid_cleanup/data/intermediate/psid_regdat_temp.dta" ,replace
 	count if tot_fam_income_at_15_18 == .
 	count if total_wealth_equity_at_15_18 == . 
 	
+	br famidpns year age cds*
+	
+	gen has_tas_long = 0 
+		replace has_tas_long =1 if tas_long_weight != 0 & tas_long_weight != . 
+	
+	tab cds14_result has_tas_long if year == 2017 
+	
+	tab cds_tas05_result has_tas_long if year == 2017 
+	tab cds_tas07_result has_tas_long if year == 2017 
+	tab cds_tas09_result has_tas_long if year == 2017 
+	tab cds_tas11_result has_tas_long if year == 2017 
+	tab cds_tas13_result has_tas_long if year == 2017 
+	tab cds_tas15_result has_tas_long if year == 2017 
+	stop
 *******************************************************************************
 **# Matching SCF 
 *******************************************************************************

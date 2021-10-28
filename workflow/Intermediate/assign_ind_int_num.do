@@ -2,9 +2,12 @@
 global path "D:/Ian"
 
 
+***********************
+// Get the interview numbers from the individual files 
+***********************
 do "$path/psid_cleanup/workflow/Raw/IND2019ER.do"
 
-// Get the interview numbers from the individual files 
+
 	rename ER30001 famid
 	label var famid "unique family id #, for each family from 1968"
 	rename ER30002 pnid
@@ -34,61 +37,71 @@ do "$path/psid_cleanup/workflow/Raw/IND2019ER.do"
 	
 *use 	"$path/psid_cleanup/data/intermediate/individual_interview_numbers.dta" , clear
 
+***********************
+// Interview Eligiblilty
+***********************
+do "$path/psid_cleanup/workflow/Raw/IND2019ER.do"
+
+
+***Combining famid and pnid to create a unique identifier for each observation
+	rename ER30001 famid
+	label var famid "unique family id #, for each family from 1968"
+	rename ER30002 pnid
+	label var pnid "unique person #, for each individual"
+
+	gen famidpn  = (famid*1000) + pn
+	tostring famidpn, gen(famidpns)
+	sort famidpn
+	
+
+	rename ER33418 cds97_eligible
+	rename ER33419 cds97_selected
+	rename ER33420 cds97_result
+	rename ER33638 cds01_result
+	rename ER33844 cds_tas05_eligible
+	rename ER33845 cds_tas05_result
+	rename ER33944 cds_tas07_eligible
+	rename ER33945 cds_tas07_result
+	rename ER34038 cds_tas09_eligible
+	rename ER34039 cds_tas09_result
+	rename ER34150 cds_tas11_eligible
+	rename ER34151 cds_tas11_result
+	rename ER34257 cds_tas13_eligible
+	rename ER34258 cds_tas13_result
+	rename ER34259 cds14_eligible
+	rename ER34260 cds14_selected
+	rename ER34261 cds14_result
+	rename ER34261A cds14_complete
+	rename ER34407 cds_tas15_eligible
+	rename ER34408 cds_tas15_result
+	rename ER34646 cds_tas17_eligible
+	rename ER34647 cds_tas17_result
+
+keep famidpns cds*
+save "$path/psid_cleanup/data/intermediate/interview_eligibility.dta", replace 	
+	
+
+***********************
+// Merge 
+***********************
+
 // bring in the "final" data
 	use "$path/psid_cleanup/data/intermediate/wealth_finaid_psid_final.dta", clear
 
-// what a beautiful merge
+// merge the weights by year
 	merge 1:1 famidpns year using "$path/psid_cleanup/data/intermediate/individual_interview_numbers.dta"
 *merge m:1 famidpns using temp_int.dta
 		keep if _merge == 3 
 		drop _merge 
 
+// merge the eligibility for the individual 
+	merge m:1 famidpns using "$path/psid_cleanup/data/intermediate/interview_eligibility.dta"
+		keep if _merge == 3 
+		drop _merge 
+		
 save "$path/psid_cleanup/data/intermediate/wealth_finaid_psid_with_indintnum.dta" , replace
 	*keep famidpn age year int_num* ind_int_num*
 	
 	
-***********************	
-// MISC / Trash 	
-***********************
-cap drop ind_int_num_status
-gen ind_int_num_status = "base"
-	replace ind_int_num_status = "Same as M & F" if ind_int_num  == int_num_f & ind_int_num == int_num_m
-	replace ind_int_num_status = "Same as Only M" if ind_int_num  != int_num_f & ind_int_num == int_num_m
-	replace ind_int_num_status = "Same as Only F" if ind_int_num  == int_num_f & ind_int_num != int_num_m
-	replace ind_int_num_status = "Different" if ind_int_num  != int_num_f & ind_int_num != int_num_m
-	replace ind_int_num_status = "none" if ind_int_num == 0
-	replace ind_int_num_status = "Grandparent" if ind_int_num_status == "Different" & (ind_int_num == int_num_ff | ind_int_num == int_num_fm |ind_int_num == int_num_mm | ind_int_num == int_num_mf)
-	
-	tab ind_int_num_status, m 
-	tab ind_int_num_status if age >= 15 & age <= 16, m
-	tab ind_int_num_status if age >= 17 & age <= 18, m
-
-	
-	count if ind_int_num_status == "Different" & age <=16
-	
-	bysort year: gen year_count = _n if ind_int_num_status == "Different" & age <=16
-	sort famidpn year
-br if ind_int_num_status == "Different" & age <=16
-
-	
-	
-sort famidpns year
-*br if ind_int_num_status == "Different" & age <= 16	
-
-cap drop ever_different 
-cap drop currently_different
-gen currently_different = 0
-replace currently_different = 1 if ind_int_num_status == "Different" & age <= 16
-bysort famidpns: egen ever_different = max(currently_different )
-order famidpn famidpns year birth_year age int_num int_num_f int_num_m ind_int_num ind_int_num_status currently_different ever_different
-*br if ever_different == 1
-
-gen mf_int_num_status = "base"
-	replace mf_int_num_status = "Different" if int_num_f != int_num_m
-	replace mf_int_num_status = "Same" if int_num_f == int_num_m
-	replace mf_int_num_status = "One 0/." if (int_num_f == 0 | int_num_f == .)  | (int_num_m == 0 | int_num_m == . )
-	replace mf_int_num_status = "Both 0/." if (int_num_f == 0 | int_num_f == .)  & (int_num_m == 0 | int_num_m == . )
-	
-
 
  

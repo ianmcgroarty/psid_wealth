@@ -3,8 +3,8 @@
 Name: Veronika Konovalova
 Project: Wealth and FAFSA 
 Description: Preparing intergenerational PSID dataset for analysis
-Last Updated: 7/23/21
-
+Last Updated: 10/28/2021
+*takes like 4 minutes
 */
 
 *************************************************************
@@ -466,4 +466,4 @@ order year birth_year age, after(famidpns)
 save "$path/psid_cleanup/data/intermediate/wealth_finaid_psid_final.dta", replace
 
 
-do "$path/psid_cleanup/workflow/assign_ind_int_num.do"
+do "$path/psid_cleanup/workflow/intermediate/assign_ind_int_num.do"
