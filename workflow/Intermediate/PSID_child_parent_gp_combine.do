@@ -7,6 +7,8 @@ Last Updated: 5/25/21
 
 */
 
+STOP THIS FILE HAS BEEN RETIRED PSID_child_parent_gp_combine
+
 *******************************
 *******************************
 ** FIMS mapping parent-child **
@@ -16,6 +18,7 @@ Last Updated: 5/25/21
 clear
 
 do "$path/psid_cleanup/workflow/Raw/fim11418_gid_BA_2_UBL_wide.do" 
+
 
 * Individual ID for person in question
 rename ER30001 famid
@@ -50,7 +53,7 @@ tostring famidpn_m, gen(famidpns_m)
 	
 keep famidpns famidpn_f famidpn_m
 
-save "$path/psid_cleanup/data/raw/parent_child.dta", replace 
+save "$path/psid_cleanup/data/raw/parent_child_old.dta", replace 
 sort famidpn_f
 
 *******************************
@@ -106,7 +109,7 @@ tostring pn_ff, gen(famidpns_ff)
 order famidpns famidpn_mm famidpn_mf famidpn_fm famidpn_ff
 keep famidpns famidpn_mm famidpn_mf famidpn_fm famidpn_ff
 
-save "$path/psid_cleanup/data/raw/grandparent_child.dta", replace 
+save "$path/psid_cleanup/data/raw/grandparent_child_old.dta", replace 
 
 ***************************************
 ***************************************
@@ -117,16 +120,16 @@ save "$path/psid_cleanup/data/raw/grandparent_child.dta", replace
 * Step 1: merge wide TAS with parent-child and gp-child identifiers on child ID
 use "$path/psid_cleanup/data/raw/tas_psid_renamed.dta", clear
 
-merge 1:1 famidpns using "$path/psid_cleanup/data/raw/parent_child.dta"
+merge 1:1 famidpns using "$path/psid_cleanup/data/raw/parent_child_old.dta"
 
 // Note there's a weird child ID without a match 
 drop if _merge == 2
 drop _merge 
 
-merge 1:1 famidpns using "$path/psid_cleanup/data/raw/grandparent_child.dta"
+merge 1:1 famidpns using "$path/psid_cleanup/data/raw/grandparent_child_old.dta"
 
 // We expect more unmatched grandchildren here. That's fine. 
 drop if _merge ==2
 drop _merge 
 
-save "$path/psid_cleanup/data/raw/tas_fims.dta", replace
+save "$path/psid_cleanup/data/raw/tas_fims_old.dta", replace

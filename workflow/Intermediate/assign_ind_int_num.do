@@ -18,7 +18,7 @@ do "$path/psid_cleanup/workflow/Raw/IND2019ER.do"
 	sort famidpn
 
 // do a rename
-	keep famidpns ER33601 ER33701 ER33801 ER33901 ER34001 ER34101 ER34201 ER34301 ER34501 
+	keep famidpns ER33601 ER33701 ER33801 ER33901 ER34001 ER34101 ER34201 ER34301 ER34501  ER34701
 	rename ER33601 ind_int_num2001
 	rename ER33701 ind_int_num2003
 	rename ER33801 ind_int_num2005
@@ -28,6 +28,7 @@ do "$path/psid_cleanup/workflow/Raw/IND2019ER.do"
 	rename ER34201 ind_int_num2013
 	rename ER34301 ind_int_num2015
 	rename ER34501 ind_int_num2017
+	rename ER34701 ind_int_num2019
 
 // I'm in love with the reshape of you
 	reshape long ind_int_num, i(famidpns) j(year)
@@ -76,6 +77,9 @@ do "$path/psid_cleanup/workflow/Raw/IND2019ER.do"
 	rename ER34408 cds_tas15_result
 	rename ER34646 cds_tas17_eligible
 	rename ER34647 cds_tas17_result
+	rename ER34859 cds_tas19_result
+	rename ER34857 cds_tas_eligible 
+	
 
 keep famidpns cds*
 save "$path/psid_cleanup/data/intermediate/interview_eligibility.dta", replace 	

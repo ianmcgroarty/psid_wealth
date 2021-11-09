@@ -12,16 +12,15 @@ global path "D:/Ian"
 set maxvar 10000
 
 
-/* Clean using prepared do-files 
+/* Clean using prepared do-files */
 
-forv i = 2001(2)2017{
+forv i = 2001(2)2019{
 clear
 do "$path/psid_cleanup/workflow/Raw/FAM`i'ER.do"
 save "$path/psid_cleanup/data/raw/fam_`i'.dta", replace
 }
 
-*$path/psid_cleanup/data/untouched/
-*/ 
+
 
 
 // Remember that for parents we want:
@@ -476,13 +475,60 @@ egen val_all_debt = rowtotal(val_debt_credit val_debt_medical val_debt_legal val
 	save "$path/psid_cleanup/data/raw/fam_2017_renamed.dta", replace 
 		
 
+		
+
+*****************
+** 2019
+*****************
+// No more wealth supplement thankfully. 		
+	use "$path/psid_cleanup/data/raw/fam_2019.dta" , clear		
+	
+// rename 
+	rename ER77511  total_wealth_equity
+	rename ER77451  biz_farm_netval
+	rename ER77453  biz_farm_debt
+	rename ER77457  savings
+	rename ER77465  val_other_realestate
+	rename ER77467  val_debt_realestate
+	rename ER77471  val_stocks
+	rename ER77473  val_vehicles
+	rename ER77477  val_other_assets
+	rename ER77481  ira_annuity
+	rename ER72031  home_value
+	rename ER72051  mortgage1
+	rename ER72052  mortgage2
+	rename ER77485  val_debt_credit
+	rename ER77489  val_debt_sl
+	rename ER77493  val_debt_medical
+	rename ER77497  val_debt_legal
+	rename ER77501  val_debt_famloans
+	rename ER77507  home_equity
+	rename ER72002  int_num
+	rename ER77631  fam_weight
+	rename ER77603  couple_status
+	rename ER77448  tot_fam_income
+	rename ER73995  val_inheritance1
+	rename ER74003  val_inheritance2
+	rename ER74011  val_inheritance3
+	rename ER74243  tot_pension
+	rename ER77505  val_debt_other
+	egen val_all_debt = rowtotal(val_debt_credit val_debt_medical val_debt_legal val_debt_famloans val_debt_sl)
+
+
+// wrap up
+	keep $keep_vars
+
+	save "$path/psid_cleanup/data/raw/fam_2019_renamed.dta", replace 
+		
+		
+		
 ***************************************
 ** Rename the variable for everyone 
 ***************************************
 
 local list "f m ff fm mf mm"
 
-forv i = 2001(2)2017 {
+forv i = 2001(2)2019 {
 	
 	foreach p of local list {
 		use "$path/psid_cleanup/data/raw/fam_`i'_renamed.dta" , clear

@@ -12,6 +12,8 @@ global path "D:/Ian"
 set maxvar 10000
 
 
+STOP THIS FILE HAS BEEN RETIRED 
+
 
 
 // Clean using prepared do-files 
