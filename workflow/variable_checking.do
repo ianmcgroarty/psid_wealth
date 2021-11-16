@@ -24,8 +24,9 @@ order $keyvarlist
 	di "$keep_ages "	
 	
 	tab age
+	tab year 
 	
-	
+	*br famidpns year tas_int_num
 *******************************************************************************	
 **# WEIGHTS 
 *******************************************************************************
@@ -116,6 +117,29 @@ order $keyvarlist
 	tabstat ind_long_weight if inlist(age,17,18), by (year) stat(count sum min mean p50 max )
 	tabstat ind_long_weight_nozero if inlist(age,17,18), by (year) stat(count sum min mean p50 max )
 	
+	
+	
+// Weight by age 
+	gen temp_tas_long_weight_15_16 = tas_long_weight if inlist(age,15,16 )
+	gen temp_tas_long_weight_17_18 = tas_long_weight if inlist(age,17,18 )
+	gen temp_tas_long_weight_19_20 = tas_long_weight if inlist(age,19,20 )
+	gen temp_tas_long_weight_21_22 = tas_long_weight if inlist(age,21,22 )
+	gen temp_tas_long_weight_23_24 = tas_long_weight if inlist(age,23,24 )
+	gen temp_tas_long_weight_25_26 = tas_long_weight if inlist(age,25,26 )
+	gen temp_tas_long_weight_27_28 = tas_long_weight if inlist(age,27,28 )
+	
+	bysort famidpns: egen tas_long_weight_15_16 = max(temp_tas_long_weight_15_16) 
+	bysort famidpns: egen tas_long_weight_17_18 = max(temp_tas_long_weight_17_18) 
+	bysort famidpns: egen tas_long_weight_19_20 = max(temp_tas_long_weight_19_20) 
+	bysort famidpns: egen tas_long_weight_21_22 = max(temp_tas_long_weight_21_22) 
+	bysort famidpns: egen tas_long_weight_23_24 = max(temp_tas_long_weight_23_24) 
+	bysort famidpns: egen tas_long_weight_25_26 = max(temp_tas_long_weight_25_26) 
+	bysort famidpns: egen tas_long_weight_27_28 = max(temp_tas_long_weight_27_28) 
+	
+	drop temp_tas*
+
+	
+*	 br $keyvarlist *weight*
 *******************************************************************************
 **# Identification Variables 
 *******************************************************************************
@@ -160,7 +184,8 @@ order $keyvarlist
 	** int_num was actually the TAS int_num but we really needed the individual FAMILY int_num to see who the child interviewed with. 
 	* br $keyvarlist 
 	
-	
+
+
 *******************************************************************************
 **# Age investigation
 *******************************************************************************
@@ -255,12 +280,13 @@ tab birth_year_f ,m
 		drop temp_nyrs
 	sort famidpn_f famidpn_m famidpns year 
 
-		
+	
+	
 *******************************************************************************
 **# Individual Student Loans
 *******************************************************************************
 * Note for value_sl I drop the 99s in renaming_tas.do
-	tabstat value_sl , statistics(count mean p10 p50 p75 min max sd)
+	tabstat value_sl , statistics(count mean p10 p50 p75 min max sd) 
 	
 // Want the value of the child's student loan debt at each age group. But the variable is currently long	
 	gen temp_sl_debt_at_17_18 = value_sl if inlist(age,17,18)
@@ -282,9 +308,9 @@ tab birth_year_f ,m
 	egen sl_debt_by_25_26 = rowmax(sl_debt_at_17_18 sl_debt_at_19_20 sl_debt_at_21_22 sl_debt_at_23_24 sl_debt_at_25_26)
 
 // see whats going on 
-	tabstat sl_debt_by_21_22 if sl_debt_by_21_22 != 0 & inlist(age,17,18) , statistics(count mean p10 p50 p75 min max sd)
-	tabstat sl_debt_by_23_24 if sl_debt_by_23_24 != 0 & inlist(age,17,18) , statistics(count mean p10 p50 p75 min max sd)
-	tabstat sl_debt_by_25_26 if sl_debt_by_25_26 != 0 & inlist(age,17,18) , statistics(count mean p10 p50 p75 min max sd)
+	tabstat sl_debt_by_21_22 if sl_debt_by_21_22 != 0 & inlist(age,17,18) , statistics(count mean p10 p50 p75 min max sd) by(year)
+	tabstat sl_debt_by_23_24 if sl_debt_by_23_24 != 0 & inlist(age,17,18) , statistics(count mean p10 p50 p75 min max sd) by(year)
+	tabstat sl_debt_by_25_26 if sl_debt_by_25_26 != 0 & inlist(age,17,18) , statistics(count mean p10 p50 p75 min max sd) by(year)
 
 // If we want to use all the student loan variables or just the subsidized ones. 
 	* We decided to only use: Stafford, Perkins, other federally subsidized since the rest are for graduate school. 
@@ -385,6 +411,9 @@ drop val_debt_sl_ff val_debt_sl_fm val_debt_sl_mf val_debt_sl_mm val_debt_sl_f v
 		*count if `var' == 9999999
 		replace `var' = . if `var' >= 9999998
 	}
+	sum home_value*
+	sum home_value_f*
+	sum home_value_m*
 	
 	
 	** There are a lot more zeros here and a lot more missings. But this might just be because of the sample? 
@@ -401,7 +430,7 @@ drop val_debt_sl_ff val_debt_sl_fm val_debt_sl_mf val_debt_sl_mm val_debt_sl_f v
 	
 	
 	foreach var of varlist mortgage1* mortgage2* {
-		sum `var'
+		qui sum `var'
 	    count if `var' == 0
 		count if `var' == .
 		count if `var' == 9999999
@@ -420,17 +449,18 @@ drop val_debt_sl_ff val_debt_sl_fm val_debt_sl_mf val_debt_sl_mm val_debt_sl_f v
 // home equity
 	** NOTE This is calculated. 
 	** This is actually a little werid for a couple of reasons, so I'm going to recalculate it after the assignment. 
-*****************
+	** NOPE we are going to use the imputed version.
+*****************/
 	sum home_equity*
 	
 	foreach var of varlist home_equity* {
-			sum `var'
+			qui sum `var'
 			count if `var' == 0
 			count if `var' == .
 			count if `var' > 9999990 & `var' != . 
 			count if `var' > 999999 & `var' != . 
 	}
-	stop 
+	 
 
 *****************	
 //  Savings
@@ -438,7 +468,7 @@ drop val_debt_sl_ff val_debt_sl_fm val_debt_sl_mf val_debt_sl_mm val_debt_sl_f v
 	sum savings* 
 		
 	foreach var of varlist savings* {
-			sum `var'
+			qui sum `var'
 			count if `var' == 0
 			count if `var' == .
 			* Sorry Bezos, no trillionairs here 
@@ -456,7 +486,7 @@ drop val_debt_sl_ff val_debt_sl_fm val_debt_sl_mf val_debt_sl_mm val_debt_sl_f v
 	sum val_stocks* 
 		
 	foreach var of varlist val_stocks* {
-			sum `var'
+			qui sum `var'
 			count if `var' == 0
 			count if `var' == .
 			replace `var' = . if `var' > 999999990
@@ -473,7 +503,7 @@ drop val_debt_sl_ff val_debt_sl_fm val_debt_sl_mf val_debt_sl_mm val_debt_sl_f v
 	
 	sum ira_annuity*
 	foreach var of varlist ira_annuity* {
-			sum `var'
+			qui sum `var'
 			count if `var' == 0
 			count if `var' == .
 			count if `var' != 0 & `var' != .
@@ -491,17 +521,36 @@ drop val_debt_sl_ff val_debt_sl_fm val_debt_sl_mf val_debt_sl_mm val_debt_sl_f v
 // We don't want pension 	
 	sum tot_pension*
 	foreach var of varlist ira_annuity* {
-			sum `var'
+			qui sum `var'
 			count if `var' == 0
 			count if `var' == .
 			count if `var' != 0 & `var' != . 
 	}
 	** A TON of missings and zeros here like this might not be super usable
 	
+ 
+
+*****************	
+//  Total Wealth
+*****************/ 
+	sum total_wealth* 
+		
+	foreach var of varlist total_wealth* {
+			qui sum `var'
+			count if `var' == 0
+			count if `var' == .
+			* Sorry Bezos, no trillionairs here 
+			replace `var' = . if `var' > 999999990
+			replace `var' = 0 if `var' <0 
+	}
+	sum savings*
+	** Seem pretty stable, father have fewer zero savings than mothers. I wonder if family savings just go (by default) into father. 
+	** There are a few negative savings, I put them to zero since they won't be materially different from 0 in FAFSA
+	*br $keyvarlist income_asignement_combination savings*
 				
 		
 	sum total_wealth*
-	
+
 	 sum total_wealth_equity_f_18
 	*hist total_wealth_equity_f_18 if total_wealth_equity_f_18 != 0
 	
@@ -591,7 +640,133 @@ drop val_debt_sl_ff val_debt_sl_fm val_debt_sl_mf val_debt_sl_mm val_debt_sl_f v
 		rename max_educ_mother educ_mother
 		rename max_educ_father educ_father
 
+	
+*******************************************************************************
+**# Child's income & Hours 
+*******************************************************************************			
+	
+// Look for differences in reporting 
+	*br $keyvarlist tas_income_earned_lastyr labor_income_earned *avg_hr*
+	
+	*replace labor_income_earned = . if labor_income_earned  == 0
+	*replace tas_income_earned_lastyr  = . if tas_income_earned_lastyr  == 0
+	
+sum labor_income_earned tas_income_earned_lastyr if age >= 20 & age <= 25
 		
+		
+*****************
+// INCOME 
+*****************/ 	
+// cleanup done in renaming tas
+
+// Tas income seems more reliable so I'm goping to use that as the base but fill in where I can. 
+	replace tas_income_earned_lastyr = labor_income_earned if tas_income_earned_lastyr == . | tas_income_earned_lastyr ==  0 
+
+// Want to make it static over life 
+	gen temp_inc_at_15_16 = tas_income_earned_lastyr if inlist(age,15,16)
+	gen temp_inc_at_17_18 = tas_income_earned_lastyr if inlist(age,17,18)
+	gen temp_inc_at_19_20 = tas_income_earned_lastyr if inlist(age,19,20)
+	gen temp_inc_at_21_22 = tas_income_earned_lastyr if inlist(age,21,22)
+	gen temp_inc_at_23_24 = tas_income_earned_lastyr if inlist(age,23,24)
+	gen temp_inc_at_25_26 = tas_income_earned_lastyr if inlist(age,25,26)
+
+	
+	bysort famidpns: egen inc_at_15_16 = max(temp_inc_at_15_16)	
+	bysort famidpns: egen inc_at_17_18 = max(temp_inc_at_17_18)
+	bysort famidpns: egen inc_at_19_20 = max(temp_inc_at_19_20)
+	bysort famidpns: egen inc_at_21_22 = max(temp_inc_at_21_22)
+	bysort famidpns: egen inc_at_23_24 = max(temp_inc_at_23_24)
+	bysort famidpns: egen inc_at_25_26 = max(temp_inc_at_25_26)
+	drop temp_inc*
+
+// Take the best income for "post college age"
+	gen         post_college_age_income = inc_at_25_26
+		replace post_college_age_income = inc_at_23_24 if post_college_age_income == . 
+		replace post_college_age_income = inc_at_21_22 if post_college_age_income == . 
+		
+*****************	
+// HOURS worked per week	
+*****************/ 	
+// cleanup 
+	replace avg_hr_worked_week_lastyr = . if avg_hr_worked_week_lastyr >= 169
+	replace avg_hr_worked_week = . if avg_hr_worked_week >= 169
+	
+// There are two variables one that is a 1 year lag (like income) and one that is a 2 year lag I'll fill in the two year lag if I can
+	sort famidpns year
+	bysort famidpns: gen lag_hours_worked_per_week = avg_hr_worked_week_lastyr[_n-1]
+	
+	gen 		hours_worked_per_week = avg_hr_worked_week
+		replace hours_worked_per_week = avg_hr_worked_week_lastyr if hours_worked_per_week == . | (hours_worked_per_week == 0 & lag_hours_worked_per_week != . )
+		
+// Want to make it static over life 
+	gen temp_hrs_at_15_16 = hours_worked_per_week if inlist(age,15,16)
+	gen temp_hrs_at_17_18 = hours_worked_per_week if inlist(age,17,18)
+	gen temp_hrs_at_19_20 = hours_worked_per_week if inlist(age,19,20)
+	gen temp_hrs_at_21_22 = hours_worked_per_week if inlist(age,21,22)
+	gen temp_hrs_at_23_24 = hours_worked_per_week if inlist(age,23,24)
+	gen temp_hrs_at_25_26 = hours_worked_per_week if inlist(age,25,26)
+
+	
+	bysort famidpns: egen hrs_worked_at_15_16 = max(temp_hrs_at_15_16)	
+	bysort famidpns: egen hrs_worked_at_17_18 = max(temp_hrs_at_17_18)
+	bysort famidpns: egen hrs_worked_at_19_20 = max(temp_hrs_at_19_20)
+	bysort famidpns: egen hrs_worked_at_21_22 = max(temp_hrs_at_21_22)
+	bysort famidpns: egen hrs_worked_at_23_24 = max(temp_hrs_at_23_24)
+	bysort famidpns: egen hrs_worked_at_25_26 = max(temp_hrs_at_25_26)
+	drop temp_hrs*
+
+// Take the best income for "post college age"
+	gen         post_college_age_hours_worked = hrs_worked_at_25_26
+		replace post_college_age_hours_worked = hrs_worked_at_23_24 if post_college_age_hours_worked == . 
+		replace post_college_age_hours_worked = hrs_worked_at_21_22 if post_college_age_hours_worked == . 
+	
+// check 
+	sum 	post_college_age_hours_worked if inlist(age,17,18)
+	count if post_college_age_hours_worked == 0 &  inlist(age,17,18)
+	count if post_college_age_hours_worked == . &  inlist(age,17,18)
+
+	*scatter post_college_age_hours_worked post_college_age_income if inlist(age,17,18)
+	*hist post_college_age_hours_worked  if inlist(age,17,18)
+	*hist post_college_age_income  if inlist(age,17,18) & post_college_age_income != 0
+		
+	
+*****************	
+// Salary per hour? 
+*****************/ 
+	
+
+*****************
+// Employment Status
+*****************/ 	
+tab employment_status_1st year , m
+gen employed = 0
+	replace employed = 1 if employment_status_1st == 1
+	replace employed = 1 if employment_status_2nd == 1
+	replace employed = 1 if employment_status_3rd == 1
+
+		
+	gen temp_emp_at_15_16 = employed if inlist(age,15,16)
+	gen temp_emp_at_17_18 = employed if inlist(age,17,18)
+	gen temp_emp_at_19_20 = employed if inlist(age,19,20)
+	gen temp_emp_at_21_22 = employed if inlist(age,21,22)
+	gen temp_emp_at_23_24 = employed if inlist(age,23,24)
+	gen temp_emp_at_25_26 = employed if inlist(age,25,26)
+
+	
+	bysort famidpns: egen is_employed_at_15_16 = max(temp_emp_at_15_16)	
+	bysort famidpns: egen is_employed_at_17_18 = max(temp_emp_at_17_18)
+	bysort famidpns: egen is_employed_at_19_20 = max(temp_emp_at_19_20)
+	bysort famidpns: egen is_employed_at_21_22 = max(temp_emp_at_21_22)
+	bysort famidpns: egen is_employed_at_23_24 = max(temp_emp_at_23_24)
+	bysort famidpns: egen is_employed_at_25_26 = max(temp_emp_at_25_26)
+
+	gen         post_college_age_employed = is_employed_at_25_26
+		replace post_college_age_employed = is_employed_at_23_24 if post_college_age_employed == . 
+		replace post_college_age_employed = is_employed_at_21_22 if post_college_age_employed == . 
+		
+	
+drop temp_emp*
+	
 *******************************************************************************
 **# Education scores
 *******************************************************************************	
@@ -835,7 +1010,7 @@ drop val_debt_sl_ff val_debt_sl_fm val_debt_sl_mf val_debt_sl_mm val_debt_sl_f v
 	tab grad_college_by_24 , m
 	
 // Years attended college by
-	br $keyvarlist first_enr*
+	*br $keyvarlist first_enr*
 	gen age_first_enrolled = .
 		replace age_first_enrolled = 16 if first_enroll_16 == 1
 		replace age_first_enrolled = 17 if first_enroll_17 == 1
@@ -847,15 +1022,17 @@ drop val_debt_sl_ff val_debt_sl_fm val_debt_sl_mf val_debt_sl_mm val_debt_sl_f v
 
 		tab age_first_enrolled ever_attend_college , m
 	
-	br if age_first_enrolled != 0 & ever_attend_college == 0 
+	*br if age_first_enrolled != 0 & ever_attend_college == 0 
 	
 
 *****************	
 //  Attending College
 *****************/ 	
+
+
 // Only want college degrees
 	tab degree_most_rec_college , m 
-	** honestly this is basically useless so I'm not going to use it. 
+	** honestly this is basically useless but I'll still use it for identifying graduate degrees where possible. 
 	
 	replace yr_enroll_most_rec_college = . if degree_most_rec_college >2 & degree_most_rec_college < 95 
 	replace yr_attend_most_rec_college = . if degree_most_rec_college >2 & degree_most_rec_college < 95 
@@ -887,46 +1064,60 @@ drop val_debt_sl_ff val_debt_sl_fm val_debt_sl_mf val_debt_sl_mm val_debt_sl_f v
 	
 	egen yr_attend_first_college  = rowmin(min_attend_earlier min_attend_mr)
 	egen yr_attend_second_college = rowmax(max_attend_earlier max_attend_mr)
-	
-drop min_enroll_earlier min_attend_earlier min_enroll_mr min_attend_mr ///
-max_enroll_earlier max_attend_earlier max_enroll_mr max_attend_mr 
-*yr_enroll_earlier_college yr_attend_earlier_college 
-*yr_enroll_most_rec_college yr_attend_most_rec_college
 
-/* GOAL: Simplify to one enroll and attend 
-	gen year_enrolled_in_college = . 
-	gen year_last_attend_college = . 
-	
-	  // if there is only one college 
-		replace year_enrolled_in_college  = yr_enroll_first_college if (yr_enroll_first_college == yr_enroll_second_college) & (yr_attend_first_college == yr_attend_second_college)
-		replace year_last_attend_college  = yr_attend_first_college if (yr_enroll_first_college == yr_enroll_second_college) & (yr_attend_first_college == yr_attend_second_college)
-*/ 		
+// Clean up a bit 
+	drop min_enroll_earlier min_attend_earlier min_enroll_mr min_attend_mr ///
+	max_enroll_earlier max_attend_earlier max_enroll_mr max_attend_mr 
+	*yr_enroll_earlier_college yr_attend_earlier_college 
+	*yr_enroll_most_rec_college yr_attend_most_rec_college
+
+	/* GOAL: Simplify to one enroll and attend - honestly not worth it. 
+		gen year_enrolled_in_college = . 
+		gen year_last_attend_college = . 
+		
+		  // if there is only one college 
+			replace year_enrolled_in_college  = yr_enroll_first_college if (yr_enroll_first_college == yr_enroll_second_college) & (yr_attend_first_college == yr_attend_second_college)
+			replace year_last_attend_college  = yr_attend_first_college if (yr_enroll_first_college == yr_enroll_second_college) & (yr_attend_first_college == yr_attend_second_college)
+	*/ 		
 
 
-// years in college 
-gen years_in_first_college = yr_attend_first_college - yr_enroll_first_college
-gen years_in_second_college = yr_attend_second_college - yr_enroll_second_college
+	// years in college +1 because 2009-2009 is kind of one year 
+	gen years_in_first_college = (yr_attend_first_college - yr_enroll_first_college) + 1
+	gen years_in_second_college = (yr_attend_second_college - yr_enroll_second_college) + 1
 
 
 // Redo the attend college 
-sort famidpns year
-cap drop current_attend_college 
+	sort famidpns year
+	cap drop current_attend_college 
 
-gen current_attend_college = 0 
-	replace current_attend_college  = 1 if year >= yr_enroll_first_college & year <= yr_attend_first_college 
-	replace current_attend_college  = 1 if year >= yr_enroll_second_college & year <= yr_attend_second_college 
-	replace current_attend_college  = . if yr_enroll_second_college == . & yr_enroll_second_college ==.
+	gen current_attend_college = 0 
+		replace current_attend_college  = 1 if year >= yr_enroll_first_college & year <= yr_attend_first_college 
+		replace current_attend_college  = 1 if year >= yr_enroll_second_college & year <= yr_attend_second_college 
+		replace current_attend_college  = . if yr_enroll_second_college == . & yr_enroll_second_college ==.
+		
+	gen attend_college_next_wave = 0
+		replace attend_college_next_wave  = 1 if year+2 >= yr_enroll_first_college & year+2 <= yr_attend_first_college 
+		replace attend_college_next_wave  = 1 if year+2 >= yr_enroll_second_college & year+2 <= yr_attend_second_college
+		replace attend_college_next_wave  = . if yr_enroll_second_college == . & yr_enroll_second_college ==.
+		replace attend_college_next_wave  = . if year+2 >= 2019
+		
+
+	*gen enrolled_oneyear_ormore_college = 0 
+	*	replace enrolled_oneyear_ormore_college = 1 if years_in_first_college >= 1
+	*	replace enrolled_oneyear_ormore_college = 1 if years_in_second_college >= 1
+	*	replace enrolled_oneyear_ormore_college = . if years_in_first_college ==.
+
+		
+	gen enrolled_oneyear_ormore_college = 0
+		// same school - first school  
+		replace enrolled_oneyear_ormore_college = 1 if (yr_enroll_first_college + 1) <= yr_attend_first_college 
+		
+		// first school didn't work out
+		*replace enrolled_oneyear_later = 1 if (yr_enroll_second_college + 1) < yr_attend_second_college 
+		
+		replace enrolled_oneyear_ormore_college = . if yr_enroll_first_college == . & yr_enroll_second_college ==. 
+		replace enrolled_oneyear_ormore_college = . if enrolled_by_19 == 0
 	
-gen attend_college_next_wave = 0
-	replace attend_college_next_wave  = 1 if year+2 >= yr_enroll_first_college & year+2 <= yr_attend_first_college 
-	replace attend_college_next_wave  = 1 if year+2 >= yr_enroll_second_college & year+2 <= yr_attend_second_college
-	replace attend_college_next_wave  = . if yr_enroll_second_college == . & yr_enroll_second_college ==.
-	replace attend_college_next_wave  = . if year+2 >= 2019
-	
-	
-
-
-
 
 /* Here is what Phil Described for persistence 
 if you enrolled in X for the first time 
@@ -938,24 +1129,76 @@ were they enrolled a year later.
 were you enrolled in the following year. 	
 
 are you enrolled in anything in this wave and then the next wave
+ 
 
-*/ 
 
-gen enrolled_oneyear_later = 0
+gen enrolled_oneyear_ormore_college= 0
 	// same school - first school  
-	replace enrolled_oneyear_later = 1 if (yr_enroll_first_college + 1) < yr_attend_first_college 
+	replace enrolled_oneyear_ormore_college = 1 if (yr_enroll_first_college + 1) < yr_attend_first_college 
 	
+
 	// first school didn't work out
-	replace enrolled_oneyear_later = 1 if (yr_enroll_second_college + 1) < yr_attend_second_college 
+	replace enrolled_oneyear_ormore_college = 1 if (yr_enroll_second_college + 1) < yr_attend_second_college 
 	
-	replace enrolled_oneyear_later = . if yr_enroll_first_college == . & yr_enroll_second_college ==. 
+	replace enrolled_oneyear_ormore_college = . if yr_enroll_first_college == . & yr_enroll_second_college ==. 
 	
 
 gen enrolled_this_and_next_wave = 0 
 	replace enrolled_this_and_next_wave = 1 if current_attend_college == 1 & attend_college_next_wave ==1
+	
+*** We talked about this 10/29 and we want to see if they have more than 1 year of college. (see above) 
+*/
+
+// Graduate 2yr or 4yr degree 
+	tab enrollment_status
+
+	gen grad_2yr_degree = 0
+		replace grad_2yr_degree = . if yr_enroll_first_college == . 
+		replace grad_2yr_degree  = 1 if enrollment_status == 5
+		replace grad_2yr_degree = 1 if grad_college == 1	
+		
+	bysort famidpns: egen max_grad_2yr_degree = max(grad_2yr_degree)
+		
+
+	gen grad_4yr_degree = 0
+		replace grad_4yr_degree = . if yr_enroll_first_college == . 
+		replace grad_4yr_degree = 1 if grad_college == 2
+		replace grad_4yr_degree  = 1 if enrollment_status == 6
+		** I'm going to assume that if they have a graduate degree they have a college 4 year degree
+		replace grad_4yr_degree  = 1 if inlist(enrollment_status, 6, 7, 11)
+		
+	bysort famidpns: egen max_grad_4yr_degree = max(grad_4yr_degree)
+
+	gen max_grad_2yr_or_4yr_degree =0 
+		replace max_grad_2yr_or_4yr_degree = 1 if max_grad_2yr_degree == 1
+		replace max_grad_2yr_or_4yr_degree = 1 if max_grad_4yr_degree == 1
+		
+	** Look into did they graduate and consitency with enrollment 
+		tab max_grad_2yr_or_4yr_degree enrolled_oneyear_ormore_college , m 
+		** looks pretty good, 210 people with graduate but no enrollment is not great. but very small. 
+		
+	
+// Never Enrolled in College? 
+	gen never_enrolled_college = 0 
+		replace never_enrolled_college = 1 if yr_enroll_first_college == . 
+	tab degree_earlier_college if never_enrolled_college  == 1, m 
+	tab degree_most_rec_college if never_enrolled_college  == 1, m 
+	tab ever_attend_college if never_enrolled_college  == 1
+	tab grad_college if never_enrolled_college  == 1
+		** There are some weird people but mostly seems okay
+
 
 	
-	
+// Last year observed 
+	gen survey_year = year if int_num != . 
+	bysort famidpns: egen last_year_surveyed = max(survey_year)
+
+	gen enrollment_status_last_year = enrollment_status if year == last_year_surveyed
+	bysort famidpns: egen max_enrollment_status_last_year  = max(enrollment_status_last_year)
+
+	sum max_grad_2yr_degree max_grad_4yr_degree max_grad_2yr_or_4yr_degree
+	count if max_grad_2yr_degree  == . & max_grad_4yr_degree != . 
+	count if max_grad_4yr_degree  == . & max_grad_2yr_degree != . 
 						
 /*******************************************************************************
 **# Family Interview Number Analysis 
@@ -1198,6 +1441,9 @@ gen enrolled_this_and_next_wave = 0
 				 * `1'_at_15_16 `1'_at_17_18
 			
 			lab var `1'_at_15_18 "Gaurdian's `1' at individual college age"	
+			
+			
+			
 	end 
 
 // Run the program
@@ -1215,6 +1461,8 @@ gen enrolled_this_and_next_wave = 0
 	assign_college_age num_kids_in_college
 	assign_college_age home_equity
 
+	
+	
 **** Outliars 
 	replace val_debt_sl_at_15_18 = . if val_debt_sl_at_15_18 > 500000
 	
@@ -1274,14 +1522,109 @@ lab value couple_status_at_15_18 couple_status
 				 * `1'_at_15_16 `1'_at_17_18
 			
 			lab var `1'_at_23_26 "Gaurdian's `1' at individual post college age"	
+
+			drop `1'_f_* `1'_m_*
+
 	end 
 				
 				
 	assign_post_college_age val_debt_sl 
 	assign_post_college_age val_all_debt
 	assign_post_college_age num_kids_in_college
+	assign_post_college_age total_wealth_equity
 
 	
+
+	
+*******************************************************************************
+**# Has Grandpaent & Grandparent Net Worth
+*******************************************************************************
+	
+// Flag if they have a grandparent Probalby need to do this by age. 
+	replace int_num_mm = . if int_num_mm == 0
+	replace int_num_mf = . if int_num_mf == 0
+	replace int_num_fm = . if int_num_fm == 0
+	replace int_num_ff = . if int_num_ff == 0
+	br $keyvarlist int_num_mm int_num_mf int_num_fm int_num_ff 
+	
+	gen mm_interviewed = 0
+		replace mm_interviewed = 1 if int_num_mm !=. 
+		
+	gen mf_interviewed = 0
+		replace mf_interviewed = 1 if int_num_mf !=. 
+	
+	gen fm_interviewed = 0
+		replace fm_interviewed = 1 if int_num_fm !=. 
+	
+	gen ff_interviewed = 0
+		replace ff_interviewed = 1 if int_num_ff !=. 
+	
+	egen has_grandparent = rowtotal(mm_interviewed mf_interviewed fm_interviewed  ff_interviewed)
+	bysort famidpns: egen ever_has_grandparent = max(has_grandparent)
+	tab ever_has_grandparent if year == 2017
+		tab ever_has_grandparent if inlist(age, 17,18)
+		
+// Now I get the grandparent's net worth at the different ages. 
+	// Step 1: get the 15/18 and /18 groupings for both parents individually 
+	local list "ff fm mf mm"
+		foreach i of local list {
+			gen          temp_`i'_15_18 = total_wealth_equity_`i'_17
+				 replace temp_`i'_15_18 = total_wealth_equity_`i'_18 if temp_`i'_15_18 == . 
+				 replace temp_`i'_15_18 = total_wealth_equity_`i'_16 if temp_`i'_15_18 == . 
+				replace temp_`i'_15_18 = total_wealth_equity_`i'_15 if temp_`i'_15_18 == . 
+				
+			gen         temp_`i'_23_26 = total_wealth_equity_`i'_23
+				replace temp_`i'_23_26 = total_wealth_equity_`i'_24 if temp_`i'_23_26 == . 
+				replace temp_`i'_23_26 = total_wealth_equity_`i'_25 if temp_`i'_23_26 == . 
+				replace temp_`i'_23_26 = total_wealth_equity_`i'_26 if temp_`i'_23_26 == . 	
+		} 
+		sum total_wealth_equity_ff total_wealth_equity_fm total_wealth_equity_mm total_wealth_equity_mf if year == 2007
+		
+		
+	// Step 2: Take the mother's side and the fathers side and add them togeher 
+		** Note, I'm just taking the max of both sides since (if the grandparents are together) mm=mf and fm=ff. 
+			** Justification that it doesn't happen often that the grand parents have different total wealth equity
+			count if total_wealth_equity_mm != total_wealth_equity_mf & total_wealth_equity_mm != . & total_wealth_equity_mf != . 
+			count if total_wealth_equity_fm != total_wealth_equity_ff & total_wealth_equity_fm != . & total_wealth_equity_ff != . 
+			
+		egen temp_twe_mom_side_15_18 = rowmax(temp_mm_15_18 temp_mf_15_18)
+		egen temp_twe_mom_side_23_26 = rowmax(temp_mm_23_26 temp_mf_23_26)
+		egen temp_twe_dad_side_15_18 = rowmax(temp_fm_15_18 temp_ff_15_18)
+		egen temp_twe_dad_side_23_26 = rowmax(temp_fm_23_26 temp_ff_23_26)
+		
+	// Step 3 combine and clean 
+		egen total_wealth_equity_grand_15_18 = rowtotal(temp_twe_mom_side_15_18 temp_twe_dad_side_15_18 )
+		egen total_wealth_equity_grand_23_26 = rowtotal(temp_twe_mom_side_23_26 temp_twe_dad_side_23_26 )
+
+			
+		drop temp* 
+		
+		lab var total_wealth_equity_grand_15_18 "Grandparent's Net Worth at individual college age"	
+		lab var total_wealth_equity_grand_23_26 "Grandparent's Net Worth at individual post college age"	
+
+
+*******************************************************************************
+**# Variable DROP
+	** There are over 1200 variables in here I don't need half of them 
+*******************************************************************************/	
+	
+// I'm not going to do the really intense logic with the grandparents. The grandparents the have are the ones they have
+
+local droplist tot_fam_income val_debt_sl home_value mortgage1 mortgage2  ira_annuity ///
+				savings val_stocks val_all_debt couple_status total_wealth_equity num_kids_in_college ///
+				home_equity biz_farm_debt biz_farm_worth  biz_farm_netval ///
+				val_inheritance1 val_inheritance2 val_inheritance3 tot_pension
+
+local famlist ""
+	foreach var of local droplist {
+		local list "ff fm mf mm f m"
+			foreach p of local list { 
+				forv i = 15/26 {
+					cap drop `var'_`p'_`i'
+					cap drop `var'_`p'
+				}	
+			}
+	}
 
 *******************************************************************************
 **# AGE DROP
@@ -1327,7 +1670,7 @@ if $keep_ages == 1 {
 		tab enrolled_by_22 fam_inc_cat  , row col
 			** this makes a lot of sense actually but "none" seems biased. 
 
-	// Dubravka Question: Look at income changes year to year
+	/* Dubravka Question: Look at income changes year to year
 		gen f15_17_income_diff = tot_fam_income_f_17 - tot_fam_income_f_15
 		gen f16_18_income_diff = tot_fam_income_f_18 - tot_fam_income_f_16
 		gen f17_19_income_diff = tot_fam_income_f_19 - tot_fam_income_f_17
@@ -1362,9 +1705,10 @@ if $keep_ages == 1 {
 		*br $keyvarlist  fam_income_at_15_16 fam_income_at_17_18 fam_income_pctchange if fam_income_pctchange > 2 & fam_income_pctchange != . 
 	
 *drop tas_cross_weight2005 tas_cross_weight2007 tas_cross_weight2009 tas_cross_weight2011 tas_cross_weight2013 tas_cross_weight2015
-
 	
-/* Rename BACK for phil
+*/ 
+	
+/* Rename BACK for phil he doesn't want this anymore
 	rename tas_long_weight	    tas_weight
 	rename tas_cross_weight cross_sectional_weight  
 	rename ind_long_weight  ind_weight              
@@ -1376,9 +1720,45 @@ if $keep_ages == 1 {
 
 save "$path/psid_cleanup/data/intermediate/psid_regdat_temp.dta" ,replace 
 	
+	stop
+// KEEP 
+	drop if tot_fam_income_at_15_18 == .	
+	keep if cds97_result == 1 
+	
+tab enrolled_by_19 max_grad_4yr
+sum max_grad_2yr_degree max_grad_4yr_degree max_grad_2yr_or_4yr_degree
+tab enrolled_by_19 max_grad_2yr_degree , m
+tab enrolled_by_19 max_grad_4yr_degree , m
+
+	
 	count if home_equity_at_15_18 == .
 	count if tot_fam_income_at_15_18 == .
 	count if total_wealth_equity_at_15_18 == . 
+	
+	br $keyvarlist enrollment_status max_grad_2yr_degree max_grad_4yr_degree enrolled_by_* ///
+	yr_enroll_first_college yr_enroll_second_college if enrolled_by_19 == 0 & max_grad_4yr_degree == 0 
+	
+		
+	br $keyvarlist enrollment_status max_grad_2yr_degree max_grad_4yr_degree enrolled_by_* ///
+	yr_enroll_first_college yr_enroll_second_college if enrolled_by_19 == 0 & max_grad_4yr_degree == 1 
+	
+	
+		br $keyvarlist enrollment_status max_grad_2yr_degree max_grad_4yr_degree enrolled_by_* ///
+		yr_enroll_first_college yr_enroll_second_college if max_grad_4yr_degree == .
+	
+*	br famidpns year age cds*
+	
+	*gen has_tas_long = 0 
+	*	replace has_tas_long =1 if tas_long_weight != 0 & tas_long_weight != . 
+	
+	*tab cds14_result has_tas_long if year == 2017 
+	
+	*tab cds_tas05_result has_tas_long if year == 2017 
+	*tab cds_tas07_result has_tas_long if year == 2017 
+	*tab cds_tas09_result has_tas_long if year == 2017 
+	*tab cds_tas11_result has_tas_long if year == 2017 
+	*tab cds_tas13_result has_tas_long if year == 2017 
+	*tab cds_tas15_result has_tas_long if year == 2017 
 	
 *******************************************************************************
 **# Matching SCF 
@@ -1407,7 +1787,7 @@ tabstat ///
 	val_all_debt_at_15_18 ///
 	, stat( count mean min p25 median p75 p90 max) format(%9.0f)
 	
-stop end 	
+stop end 1424
 	tabstat ///
 	tot_fam_income_at_15_18 ///
 	savings_at_15_18  ///

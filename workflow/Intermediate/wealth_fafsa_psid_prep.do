@@ -3,8 +3,8 @@
 Name: Veronika Konovalova
 Project: Wealth and FAFSA 
 Description: Preparing intergenerational PSID dataset for analysis
-Last Updated: 7/23/21
-
+Last Updated: 10/28/2021
+*takes like 4 minutes
 */
 
 *************************************************************
@@ -26,7 +26,8 @@ do "$path/psid_cleanup/workflow/Intermediate/Renaming_Raw_data/renaming_tas.do"
 
    
 // Step 2: clean the FIMS files and merge them with the TAS 
-do "$path/psid_cleanup/workflow/Intermediate/PSID_child_parent_gp_combine.do"
+*do "$path/psid_cleanup/workflow/Intermediate/PSID_child_parent_gp_combine.do"
+do "$path/psid_cleanup/workflow/Intermediate/child_parent_grandparent_matching.do"
    * Product: "$path/psid_cleanup/data/raw/tas_fims.dta", TAS variables with attached parent and grandparent 1968 dynasty identifiers
 
    
@@ -42,7 +43,7 @@ drop _merge
 
 local list "f m ff fm mf mm"
 foreach p of local list{
-merge m:1 famidpn_`p' using "$path/psid_cleanup/data/raw/fam_ids_int_`p'.dta"
+merge m:1 famidpns_`p' using "$path/psid_cleanup/data/raw/fam_ids_int_`p'.dta"
 drop if _merge == 2
 drop _merge 
 
@@ -57,22 +58,24 @@ save "$path/psid_cleanup/data/raw/tas_with_ind.dta", replace
 
 // Step 4: stitch together all years of the family files, rename variables and keep the ones of interest. Then, merge that with TAS and IND
 	* If you need more family level variables, get them here: 
+	* Retired renaming_fam_fin
 do "$path/psid_cleanup/workflow/Intermediate/Renaming_Raw_data/renaming_fam_fin_imputed.do" 
 
-use "$path/psid_cleanup/data/raw/tas_with_ind.dta"
 
 // Now merge with TAS and IND
 use "$path/psid_cleanup/data/raw/tas_with_ind.dta", clear
 
 foreach p of local list{
-	forv i = 2001(2)2017{
+	forv i = 2001(2)2019{
 		merge m:1 int_num_`p'`i' using "$path/psid_cleanup/data/raw/fam_`i'_renamed_`p'.dta"
 		drop if _merge == 2
 		drop _merge
 		
+		/* don't need this since i switched over to the imputed wealth variables. 
 		merge m:1 int_num_`p'`i' using "$path/psid_cleanup/data/raw/fam_wealth_`p'_`i'.dta"
 		drop if _merge == 2
 		drop _merge
+		*/
 	}
 }
 
@@ -83,7 +86,7 @@ save "$path/psid_cleanup/data/raw/tas_ind_fam_merged.dta", replace
 // Step 5: fix ages and make long 
 use "$path/psid_cleanup/data/raw/tas_ind_fam_merged.dta", clear 
 
-reshape long int_num ind_weight ind_cross_weight tas_weight cross_sectional_weight cds_weight ///
+reshape long int_num ind_weight ind_cross_weight tas_weight  cross_sectional_weight cds_weight ///
  completed_college fam_bought_house_condo ///
 value_house_condo fam_paid_rent_mortgage ///
 value_rent_mortgage fam_bought_car value_car fam_paid_tuition value_tuition fam_helped_pay_sl ///
@@ -158,9 +161,12 @@ val_debt_medical_f val_debt_medical_m val_debt_medical_ff val_debt_medical_fm va
 val_debt_legal_f val_debt_legal_m val_debt_legal_ff val_debt_legal_fm val_debt_legal_mf val_debt_legal_mm ///
 val_debt_famloans_f val_debt_famloans_m val_debt_famloans_ff val_debt_famloans_fm val_debt_famloans_mf val_debt_famloans_mm ///
 val_other_realestate_f val_other_realestate_m val_vehicles_f val_vehicles_m val_other_assets_f val_other_assets_m ///
-val_debt_other_f val_debt_other_m ///
+val_other_realestate_ff val_other_realestate_fm val_vehicles_ff val_vehicles_fm val_other_assets_ff val_other_assets_fm ///
+val_other_realestate_mf val_other_realestate_mm val_vehicles_mf val_vehicles_mm val_other_assets_mf val_other_assets_mm ///
+val_debt_other_f val_debt_other_m val_debt_other_ff val_debt_other_fm val_debt_other_mf val_debt_other_mm enrollment_status  ///
+last_grade_finished why_stop_college_mr why_stop_college_earlier val_debt_realestate_f val_debt_realestate_m val_debt_realestate_ff val_debt_realestate_fm val_debt_realestate_mf val_debt_realestate_mm ///
+avg_hr_worked_week avg_hr_worked_week_lastyr tas_income_earned_lastyr employment_status_1st employment_status_2nd employment_status_3rd ///
 fam_weight_ff fam_weight_fm fam_weight_mf fam_weight_mm, i(famidpn famidpns) j(year)
-
 order famidpn famidpns year int_num tas_weight TAS* age
 
 // Fill in ages when they're 0
@@ -177,7 +183,7 @@ save "$path/psid_cleanup/data/intermediate/psid_clean_long.dta", replace
 
 
 // Back to wide with fixed age 
-reshape wide int_num ind_weight ind_cross_weight tas_weight cross_sectional_weight cds_weight completed_college fam_bought_house_condo ///
+reshape wide int_num ind_weight ind_cross_weight tas_weight  cross_sectional_weight cds_weight completed_college fam_bought_house_condo ///
 value_house_condo fam_paid_rent_mortgage ///
 value_rent_mortgage fam_bought_car value_car fam_paid_tuition value_tuition fam_helped_pay_sl ///
 value_sl value_sl_all fam_paid_expenses value_expenses got_personal_loan value_personal_loan ///
@@ -252,7 +258,11 @@ val_debt_medical_f val_debt_medical_m val_debt_medical_ff val_debt_medical_fm va
 val_debt_legal_f val_debt_legal_m val_debt_legal_ff val_debt_legal_fm val_debt_legal_mf val_debt_legal_mm ///
 val_debt_famloans_f val_debt_famloans_m val_debt_famloans_ff val_debt_famloans_fm val_debt_famloans_mf val_debt_famloans_mm ///
 val_other_realestate_f val_other_realestate_m val_vehicles_f val_vehicles_m val_other_assets_f val_other_assets_m ///
-val_debt_other_f val_debt_other_m ///
+val_other_realestate_ff val_other_realestate_fm val_vehicles_ff val_vehicles_fm val_other_assets_ff val_other_assets_fm ///
+val_other_realestate_mf val_other_realestate_mm val_vehicles_mf val_vehicles_mm val_other_assets_mf val_other_assets_mm ///
+val_debt_other_f val_debt_other_m val_debt_other_ff val_debt_other_fm val_debt_other_mf val_debt_other_mm enrollment_status  ///
+last_grade_finished why_stop_college_mr why_stop_college_earlier val_debt_realestate_f val_debt_realestate_m val_debt_realestate_ff val_debt_realestate_fm val_debt_realestate_mf val_debt_realestate_mm ///
+avg_hr_worked_week avg_hr_worked_week_lastyr tas_income_earned_lastyr employment_status_1st employment_status_2nd employment_status_3rd ///
 fam_weight_ff fam_weight_fm fam_weight_mf fam_weight_mm, i(famidpn famidpns) j(year)
  
 sort famidpn age*
@@ -293,7 +303,7 @@ foreach p of local list{
 * total wealth equity for grandparents only
 local list "ff fm mf mm"
 foreach p of local list{
-	forv i = 16/19{
+	forv i = 15/19{
 			g temp_total_wealth_equity_`p'_`i' = total_wealth_equity_`p' if age == `i'
 			egen total_wealth_equity_`p'_`i' = max(temp_total_wealth_equity_`p'_`i'), by(famidpn)
 			
@@ -370,7 +380,7 @@ replace yr_first_enroll = 0 if yr_first_enroll > 2050
 local vars "total_wealth_equity "
 foreach p of local list{
     foreach v of local vars{
-	    forv i = 20/24{
+	    forv i = 20/26{
 		g t_`v'_`p'_`i' = `v'_`p' if age == `i'
 		egen `v'_`p'_`i' = max(t_`v'_`p'_`i'), by(famidpn)
 	 
@@ -466,4 +476,4 @@ order year birth_year age, after(famidpns)
 save "$path/psid_cleanup/data/intermediate/wealth_finaid_psid_final.dta", replace
 
 
-do "$path/psid_cleanup/workflow/assign_ind_int_num.do"
+do "$path/psid_cleanup/workflow/intermediate/assign_ind_int_num.do"
