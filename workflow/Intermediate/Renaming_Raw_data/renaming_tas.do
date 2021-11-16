@@ -274,6 +274,7 @@ egen value_sl_all2017 = rowtotal(TA170711 TA170717 TA170723 TA170729 TA170735 TA
 egen value_sl_all2019 = rowtotal(TA190905 TA190907 TA190909 TA190911)
 
 
+
 rename TA050567 fam_paid_expenses2005
 rename TA070541 fam_paid_expenses2007
 rename TA090578 fam_paid_expenses2009
@@ -902,6 +903,83 @@ rename TA150070 marital_status_2015
 rename TA170093 marital_status_2017
 rename TA190132 marital_status_2019
 
+rename TA070338 avg_hr_worked_week2007
+rename TA070340 avg_hr_worked_week_lastyr2007
+rename TA090355 avg_hr_worked_week2009
+rename TA090357 avg_hr_worked_week_lastyr2009
+rename TA110345 avg_hr_worked_week2011
+rename TA110347 avg_hr_worked_week_lastyr2011
+rename TA130344 avg_hr_worked_week2013
+rename TA130346 avg_hr_worked_week_lastyr2013
+rename TA150346 avg_hr_worked_week2015
+rename TA150348 avg_hr_worked_week_lastyr2015
+rename TA170190 avg_hr_worked_week2017
+rename TA170197 avg_hr_worked_week_lastyr2017
+rename TA190232 avg_hr_worked_week2019
+rename TA190238 avg_hr_worked_week_lastyr2019
+
+rename TA090403 tas_income_earned_lastyr2009
+rename TA110483 tas_income_earned_lastyr2011
+rename TA130503 tas_income_earned_lastyr2013
+rename TA150512 tas_income_earned_lastyr2015
+
+rename TA170462 salary_income_amt2017
+rename TA170466 bonus_income_amt2017
+rename TA170469 ot_income_amt2017
+rename TA170472 tips_income_amt2017
+rename TA170475 commissions_income_amt2017
+rename TA170478 other_labor_income_amt2017
+rename TA190665 salary_income_amt2019
+rename TA190669 bonus_income_amt2019
+rename TA190672 ot_income_amt2019
+rename TA190675 tips_income_amt2019
+rename TA190678 commissions_income_amt2019
+rename TA190681 other_labor_income_amt2019
+
+
+foreach var of varlist *income_amt* {
+	replace `var' = . if `var' >= 999998
+	*replace `var' = . if `var' == 0 
+	
+}
+
+egen tas_income_earned_lastyr2017 = rowtotal(salary_income_amt2017 bonus_income_amt2017 ot_income_amt2017 tips_income_amt2017 commissions_income_amt2017 other_labor_income_amt2017 )
+egen tas_income_earned_lastyr2019 = rowtotal(salary_income_amt2019 bonus_income_amt2019 ot_income_amt2019 tips_income_amt2019 commissions_income_amt2019 other_labor_income_amt2019 )
+
+
+foreach var of varlist tas_income_earned_lastyr* {
+	replace `var' = . if `var' >= 9999998
+	*replace `var' = . if `var' == 0 
+	
+}
+
+
+rename TA050127 employment_status_1st2005
+rename TA050128 employment_status_2nd2005
+rename TA050129 employment_status_3rd2005
+rename TA070127 employment_status_1st2007
+rename TA070128 employment_status_2nd2007
+rename TA070129 employment_status_3rd2007
+rename TA090136 employment_status_1st2009
+rename TA090137 employment_status_2nd2009
+rename TA090138 employment_status_3rd2009
+rename TA110137 employment_status_1st2011
+rename TA110138 employment_status_2nd2011
+rename TA110139 employment_status_3rd2011
+rename TA130136 employment_status_1st2013
+rename TA130137 employment_status_2nd2013
+rename TA130138 employment_status_3rd2013
+rename TA150128 employment_status_1st2015
+rename TA150129 employment_status_2nd2015
+rename TA150130 employment_status_3rd2015
+rename TA170183 employment_status_1st2017
+rename TA170184 employment_status_2nd2017
+rename TA170185 employment_status_3rd2017
+rename TA190225 employment_status_1st2019
+rename TA190226 employment_status_2nd2019
+rename TA190227 employment_status_3rd2019
+
+
 // CREATE A VAR THAT RECORDS WHEN AN INDIVIDUAL FIRST ENROLLED IN COLLEGE 
 forv i = 2005(2)2019{
     replace yr_enroll_earlier_college`i' = . if yr_enroll_earlier_college`i' == 0
@@ -954,6 +1032,6 @@ highest_gpa_earlier_college* highest_gpa_college_two*  degree_earlier_college* /
 ethnicity* race* hispan* highest_educ_level* educ_mother* recent_educ_mother* ///
 educ_father* recent_educ_father* marital_status_* ///
 cross_sectional_weight* cds_weight* why_stop_college_earlier* why_stop_college_mr* enrollment_status* ///
-tas_int_num*
+tas_int_num* avg_hr_worked_week* tas_income_earned_lastyr* employment_status_*
 
 save "$path/psid_cleanup/data/raw/tas_psid_renamed.dta",replace 

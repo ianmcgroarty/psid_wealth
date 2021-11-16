@@ -18,7 +18,10 @@ do "$path/psid_cleanup/workflow/Raw/IND2019ER.do"
 	sort famidpn
 
 // do a rename
-	keep famidpns ER33601 ER33701 ER33801 ER33901 ER34001 ER34101 ER34201 ER34301 ER34501  ER34701
+	keep famidpns ///
+		ER33601 ER33701 ER33801 ER33901 ER34001 ER34101 ER34201 ER34301 ER34501  ER34701 ///
+		ER33838C ER33938C ER34032A ER34144A ER34251A ER34401A ER34636 ER34845 
+
 	rename ER33601 ind_int_num2001
 	rename ER33701 ind_int_num2003
 	rename ER33801 ind_int_num2005
@@ -29,9 +32,18 @@ do "$path/psid_cleanup/workflow/Raw/IND2019ER.do"
 	rename ER34301 ind_int_num2015
 	rename ER34501 ind_int_num2017
 	rename ER34701 ind_int_num2019
+	
+	rename ER33838C labor_income_earned2005
+	rename ER33938C labor_income_earned2007
+	rename ER34032A labor_income_earned2009
+	rename ER34144A labor_income_earned2011
+	rename ER34251A labor_income_earned2013
+	rename ER34401A labor_income_earned2015
+	rename ER34636 labor_income_earned2017
+	rename ER34845 labor_income_earned2019
 
 // I'm in love with the reshape of you
-	reshape long ind_int_num, i(famidpns) j(year)
+	reshape long ind_int_num labor_income_earned , i(famidpns) j(year)
 
 // save
 	save "$path/psid_cleanup/data/intermediate/individual_interview_numbers.dta" , replace 
@@ -79,8 +91,8 @@ do "$path/psid_cleanup/workflow/Raw/IND2019ER.do"
 	rename ER34647 cds_tas17_result
 	rename ER34859 cds_tas19_result
 	rename ER34857 cds_tas_eligible 
-	
 
+	
 keep famidpns cds*
 save "$path/psid_cleanup/data/intermediate/interview_eligibility.dta", replace 	
 	
@@ -103,6 +115,7 @@ save "$path/psid_cleanup/data/intermediate/interview_eligibility.dta", replace
 		keep if _merge == 3 
 		drop _merge 
 		
+			
 save "$path/psid_cleanup/data/intermediate/wealth_finaid_psid_with_indintnum.dta" , replace
 	*keep famidpn age year int_num* ind_int_num*
 	

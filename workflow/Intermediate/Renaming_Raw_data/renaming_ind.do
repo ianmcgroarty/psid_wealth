@@ -91,6 +91,7 @@ preserve
 
 keep famidpn famidpns age* sex ind_weight* ind_cross_weight*
 
+** This is for the merge with TAS
 save "$path/psid_cleanup/data/raw/ind_er.dta", replace
 
 restore
@@ -128,6 +129,7 @@ forv i = 11(2)19{
 	rename age2019 age_`p'2019
 
 
+** This is for the merge with the parents data
 save "$path/psid_cleanup/data/raw/fam_ids_int_`p'.dta", replace
 
 restore

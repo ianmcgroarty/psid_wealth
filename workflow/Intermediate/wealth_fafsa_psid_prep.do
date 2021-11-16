@@ -161,9 +161,12 @@ val_debt_medical_f val_debt_medical_m val_debt_medical_ff val_debt_medical_fm va
 val_debt_legal_f val_debt_legal_m val_debt_legal_ff val_debt_legal_fm val_debt_legal_mf val_debt_legal_mm ///
 val_debt_famloans_f val_debt_famloans_m val_debt_famloans_ff val_debt_famloans_fm val_debt_famloans_mf val_debt_famloans_mm ///
 val_other_realestate_f val_other_realestate_m val_vehicles_f val_vehicles_m val_other_assets_f val_other_assets_m ///
-val_debt_other_f val_debt_other_m enrollment_status ///
+val_other_realestate_ff val_other_realestate_fm val_vehicles_ff val_vehicles_fm val_other_assets_ff val_other_assets_fm ///
+val_other_realestate_mf val_other_realestate_mm val_vehicles_mf val_vehicles_mm val_other_assets_mf val_other_assets_mm ///
+val_debt_other_f val_debt_other_m val_debt_other_ff val_debt_other_fm val_debt_other_mf val_debt_other_mm enrollment_status  ///
+last_grade_finished why_stop_college_mr why_stop_college_earlier val_debt_realestate_f val_debt_realestate_m val_debt_realestate_ff val_debt_realestate_fm val_debt_realestate_mf val_debt_realestate_mm ///
+avg_hr_worked_week avg_hr_worked_week_lastyr tas_income_earned_lastyr employment_status_1st employment_status_2nd employment_status_3rd ///
 fam_weight_ff fam_weight_fm fam_weight_mf fam_weight_mm, i(famidpn famidpns) j(year)
-
 order famidpn famidpns year int_num tas_weight TAS* age
 
 // Fill in ages when they're 0
@@ -255,7 +258,11 @@ val_debt_medical_f val_debt_medical_m val_debt_medical_ff val_debt_medical_fm va
 val_debt_legal_f val_debt_legal_m val_debt_legal_ff val_debt_legal_fm val_debt_legal_mf val_debt_legal_mm ///
 val_debt_famloans_f val_debt_famloans_m val_debt_famloans_ff val_debt_famloans_fm val_debt_famloans_mf val_debt_famloans_mm ///
 val_other_realestate_f val_other_realestate_m val_vehicles_f val_vehicles_m val_other_assets_f val_other_assets_m ///
-val_debt_other_f val_debt_other_m enrollment_status  ///
+val_other_realestate_ff val_other_realestate_fm val_vehicles_ff val_vehicles_fm val_other_assets_ff val_other_assets_fm ///
+val_other_realestate_mf val_other_realestate_mm val_vehicles_mf val_vehicles_mm val_other_assets_mf val_other_assets_mm ///
+val_debt_other_f val_debt_other_m val_debt_other_ff val_debt_other_fm val_debt_other_mf val_debt_other_mm enrollment_status  ///
+last_grade_finished why_stop_college_mr why_stop_college_earlier val_debt_realestate_f val_debt_realestate_m val_debt_realestate_ff val_debt_realestate_fm val_debt_realestate_mf val_debt_realestate_mm ///
+avg_hr_worked_week avg_hr_worked_week_lastyr tas_income_earned_lastyr employment_status_1st employment_status_2nd employment_status_3rd ///
 fam_weight_ff fam_weight_fm fam_weight_mf fam_weight_mm, i(famidpn famidpns) j(year)
  
 sort famidpn age*
@@ -296,7 +303,7 @@ foreach p of local list{
 * total wealth equity for grandparents only
 local list "ff fm mf mm"
 foreach p of local list{
-	forv i = 16/19{
+	forv i = 15/19{
 			g temp_total_wealth_equity_`p'_`i' = total_wealth_equity_`p' if age == `i'
 			egen total_wealth_equity_`p'_`i' = max(temp_total_wealth_equity_`p'_`i'), by(famidpn)
 			
@@ -373,7 +380,7 @@ replace yr_first_enroll = 0 if yr_first_enroll > 2050
 local vars "total_wealth_equity "
 foreach p of local list{
     foreach v of local vars{
-	    forv i = 20/24{
+	    forv i = 20/26{
 		g t_`v'_`p'_`i' = `v'_`p' if age == `i'
 		egen `v'_`p'_`i' = max(t_`v'_`p'_`i'), by(famidpn)
 	 
